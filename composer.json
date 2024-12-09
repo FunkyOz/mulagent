@@ -1,0 +1,64 @@
+{
+    "name": "funkyoz/mulagent",
+    "version": "0.0.1",
+    "description": "Library to handle llm multi agent pattern",
+    "keywords": [
+        "php",
+        "llm",
+        "ai",
+        "agent",
+        "multi agent"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lorenzo Dessimoni",
+            "email": "lorenzo.dessimoni@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1.0",
+        "beberlei/assert": "^3.3",
+        "nyholm/psr7": "^1.8",
+        "openai-php/client": "^0.10.3",
+        "symfony/http-client": "^6.4"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.2.0",
+        "mockery/mockery": "^1.6",
+        "pestphp/pest": "^2.0.0",
+        "phpstan/phpstan": "^1.8.6",
+        "symfony/var-dumper": "^6.2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mulagent\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist",
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "scripts": {
+        "lint": "pint -v",
+        "tests:lint": "pint --test -v",
+        "tests:types": "phpstan analyse --ansi",
+        "tests:unit": "pest --colors=always",
+        "tests": [
+            "@tests:lint",
+            "@tests:types",
+            "@tests:unit"
+        ]
+    }
+}
