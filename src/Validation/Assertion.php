@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\Validation;
+namespace MulAgent\Validation;
 
 use Assert\Assertion as BaseAssertion;
-use Mulagent\Exceptions\AssertionException;
+use MulAgent\Exceptions\AssertionException;
 
 class Assertion extends BaseAssertion
 {

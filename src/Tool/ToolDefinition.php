@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\Tool;
+namespace MulAgent\Tool;
 
 class ToolDefinition
 {

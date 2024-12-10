@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\LLM;
+namespace MulAgent\LLM;
 
-use Mulagent\Message\Message;
-use Mulagent\Tool\ToolCall;
+use MulAgent\Message\Message;
+use MulAgent\Tool\ToolCall;
 
 class LLMResult
 {

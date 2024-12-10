@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\Message;
+namespace MulAgent\Message;
 
 class Message
 {
@@ -36,5 +36,20 @@ class Message
     public function isTool(): bool
     {
         return MessageRole::TOOL === $this->role;
+    }
+
+    public function isSystem(): bool
+    {
+        return MessageRole::SYSTEM === $this->role;
+    }
+
+    public function isAssistant(): bool
+    {
+        return MessageRole::ASSISTANT === $this->role;
+    }
+
+    public function isUser(): bool
+    {
+        return MessageRole::USER === $this->role;
     }
 }

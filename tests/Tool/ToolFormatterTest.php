@@ -1,8 +1,8 @@
 <?php
 
-use Mulagent\Tool\Property;
-use Mulagent\Tool\ToolFormatter;
-use Mulagent\Tool\ToolDefinition;
+use MulAgent\Tool\Property;
+use MulAgent\Tool\ToolFormatter;
+use MulAgent\Tool\ToolDefinition;
 
 it('should format property', function (Property $property, array $expected) {
     expect(ToolFormatter::formatProperty($property))

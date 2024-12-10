@@ -1,13 +1,12 @@
 <?php
 
-use Mulagent\Agent\Agent;
-use Mulagent\Agent\AgentRunner;
-use Mulagent\LLM\OpenAI\OpenAIConfig;
-use Mulagent\LLM\OpenAI\OpenAILLM;
-use Mulagent\Utility\Utility;
+use MulAgent\Agent\Agent;
+use MulAgent\MulAgent;
+use MulAgent\LLM\OpenAI\OpenAIConfig;
+use MulAgent\LLM\OpenAI\OpenAILLM;
+use MulAgent\Tool\AgentTool;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Testing\ClientFake;
-use Tests\Mock\FakeAgentTool;
 
 function createFakeOpenAIChatResponse(array $response): CreateResponse
 {
@@ -21,7 +20,7 @@ function createFakeOpenAIChatResponse(array $response): CreateResponse
                 'type' => 'function',
                 'function' => [
                     'name' => $response['tool_name'],
-                    'arguments' => Utility::jsonEncode($response['tool_args'] ?? [])
+                    'arguments' => json_encode($response['tool_args'] ?? [], JSON_THROW_ON_ERROR)
                 ],
             ]
         ];
@@ -47,16 +46,16 @@ function createFakeAgent(string $name, OpenAILLM $llm, ?string $instructions = n
     return $agent;
 }
 
-function createFakeAgentRunner(array $agents): AgentRunner
+function createFakeAgentRunner(array $agents): MulAgent
 {
     foreach ($agents as $agent1) {
         foreach ($agents as $agent2) {
             if ($agent1->name !== $agent2->name) {
-                $agent1->tools = array_merge($agent1->tools, [new FakeAgentTool($agent2)]);
+                $agent1->tools = array_merge($agent1->tools, [new AgentTool($agent2)]);
             }
         }
     }
-    return new AgentRunner($agents[0]);
+    return new MulAgent($agents[0]);
 }
 
 function assertArrayEqual(array $value, array $expected): void

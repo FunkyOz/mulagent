@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\Agent;
+namespace MulAgent\Agent;
 
-use Mulagent\LLM\LLMInterface;
-use Mulagent\Tool\ToolInterface;
+use MulAgent\LLM\LLMInterface;
+use MulAgent\Tool\ToolInterface;
 
-class Agent
+final class Agent
 {
     /**
-     * @param  string  $name
+     * @param  non-empty-string  $name
      * @param  LLMInterface  $llm
      * @param  string|null  $instruction
      * @param  array<ToolInterface>  $tools

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\Tool;
+namespace MulAgent\Tool;
 
 class ToolCall
 {
     /**
      * @param  string  $id
      * @param  string  $name
-     * @param  array<string, mixed>  $arguments
+     * @param  array<mixed>  $arguments
      */
     public function __construct(
         readonly string $id,

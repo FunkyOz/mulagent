@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\Agent;
+namespace MulAgent\Agent;
 
-use Mulagent\Message\Message;
-use Mulagent\Tool\ToolOutput;
+use MulAgent\Message\Message;
+use MulAgent\Tool\ToolOutput;
 
 class AgentResult
 {

@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\Agent;
+namespace MulAgent;
 
-use Mulagent\Message\Message;
-use Mulagent\Tool\ToolCall;
-use Mulagent\Tool\ToolDefinition;
-use Mulagent\Tool\ToolInterface;
-use Mulagent\Utility\Utility;
+use MulAgent\Agent\Agent;
+use MulAgent\Agent\AgentResponse;
+use MulAgent\Agent\AgentResult;
+use MulAgent\Message\Message;
+use MulAgent\Tool\ToolCall;
+use MulAgent\Tool\ToolDefinition;
+use MulAgent\Tool\ToolInterface;
 
-class AgentRunner
+final class MulAgent
 {
     public function __construct(private readonly Agent $agent)
     {
@@ -48,20 +50,23 @@ class AgentRunner
 
     /**
      * @param  array<Message>  $messages
-     * @param  float  $maxTurns
+     * @param  int  $maxTurns
      * @param  bool  $executeTools
      * @return AgentResponse
      */
     public function run(
         array $messages = [],
-        float $maxTurns = INF,
+        int $maxTurns = PHP_INT_MAX,
         bool $executeTools = true
     ): AgentResponse {
         $agentResults = [];
         $activeAgent = $this->agent;
-        $history = Utility::arrayClone($messages);
+        $history = $messages;
         if ($activeAgent->instruction !== null && $activeAgent->instruction !== '') {
-            $history = array_merge([Message::system($activeAgent->instruction)], $history);
+            $history = array_merge(
+                [Message::system($activeAgent->instruction)],
+                array_filter($history, fn (Message $message) => !$message->isSystem())
+            );
         }
         $historyInitLen = count($history);
         while (count($history) - $historyInitLen < $maxTurns) {

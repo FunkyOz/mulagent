@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\Tool;
+namespace MulAgent\Tool;
 
-use Mulagent\Exceptions\ExceptionFactory;
+use MulAgent\Exceptions\ExceptionFactory;
 
 class ToolFormatter
 {

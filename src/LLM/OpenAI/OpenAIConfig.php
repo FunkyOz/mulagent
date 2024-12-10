@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\LLM\OpenAI;
+namespace MulAgent\LLM\OpenAI;
 
-use Mulagent\Validation\Assert;
+use MulAgent\Validation\Assert;
 use OpenAI\Contracts\ClientContract;
 
 final class OpenAIConfig

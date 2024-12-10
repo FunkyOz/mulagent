@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\Message;
+namespace MulAgent\Message;
 
 enum MessageRole: string
 {

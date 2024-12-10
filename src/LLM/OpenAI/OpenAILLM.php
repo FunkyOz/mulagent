@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\LLM\OpenAI;
+namespace MulAgent\LLM\OpenAI;
 
 use JsonException;
-use Mulagent\Exceptions\ExceptionFactory;
-use Mulagent\LLM\LLMInterface;
-use Mulagent\LLM\LLMResult;
-use Mulagent\Message\Message;
-use Mulagent\Tool\ToolCall;
-use Mulagent\Tool\ToolDefinition;
-use Mulagent\Tool\ToolFormatter;
-use Mulagent\Utility\Utility;
+use MulAgent\Exceptions\ExceptionFactory;
+use MulAgent\LLM\LLMInterface;
+use MulAgent\LLM\LLMResult;
+use MulAgent\Message\Message;
+use MulAgent\Tool\ToolCall;
+use MulAgent\Tool\ToolDefinition;
+use MulAgent\Tool\ToolFormatter;
 use OpenAI;
 use OpenAI\Contracts\ClientContract;
 
@@ -64,7 +63,7 @@ final class OpenAILLM implements LLMInterface
         }
         if (count($tools) > 0) {
             $parameters['tools'] = array_map(
-                fn(ToolDefinition $tool) => ToolFormatter::formatToolDefinitionAsJsonSchema($tool),
+                fn (ToolDefinition $tool) => ToolFormatter::formatToolDefinitionAsJsonSchema($tool),
                 $tools
             );
         }
@@ -77,7 +76,7 @@ final class OpenAILLM implements LLMInterface
             $toolCalls[] = new ToolCall(
                 $toolCall->id,
                 $toolCall->function->name,
-                Utility::jsonDecode($toolCall->function->arguments),
+                (array)json_decode($toolCall->function->arguments, true, 512, JSON_THROW_ON_ERROR),
             );
         }
 

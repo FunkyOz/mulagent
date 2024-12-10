@@ -1,8 +1,8 @@
 <?php
 
-use Mulagent\LLM\OpenAI\OpenAIConfig;
-use Mulagent\LLM\OpenAI\OpenAILLM;
-use Mulagent\Message\MessageRole;
+use MulAgent\LLM\OpenAI\OpenAIConfig;
+use MulAgent\LLM\OpenAI\OpenAILLM;
+use MulAgent\Message\MessageRole;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Testing\ClientFake;
 

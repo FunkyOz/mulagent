@@ -1,13 +1,14 @@
 {
     "name": "funkyoz/mulagent",
-    "version": "0.0.1",
-    "description": "Library to handle llm multi agent pattern",
+    "version": "1.0.0",
+    "description": "Handle llm multi agent pattern",
     "keywords": [
         "php",
         "llm",
         "ai",
         "agent",
-        "multi agent"
+        "multi agent",
+        "openai"
     ],
     "license": "MIT",
     "authors": [
@@ -32,7 +33,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Mulagent\\": "src/"
+            "MulAgent\\": "src/"
         }
     },
     "autoload-dev": {

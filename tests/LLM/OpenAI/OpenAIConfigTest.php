@@ -1,8 +1,8 @@
 <?php
 
-use Mulagent\Exceptions\AssertionException;
-use Mulagent\Exceptions\LazyAssertionException;
-use Mulagent\LLM\OpenAI\OpenAIConfig;
+use MulAgent\Exceptions\AssertionException;
+use MulAgent\Exceptions\LazyAssertionException;
+use MulAgent\LLM\OpenAI\OpenAIConfig;
 use OpenAI\Contracts\ClientContract;
 use OpenAI\Testing\ClientFake;
 

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mulagent\Tool;
+namespace MulAgent\Tool;
 
-use Mulagent\Agent\Agent;
-use Mulagent\Exceptions\ExceptionFactory;
+use MulAgent\Agent\Agent;
+use MulAgent\Exceptions\ExceptionFactory;
 
 final class ToolOutput
 {

@@ -1,8 +1,8 @@
 <?php
 
-use Mulagent\Message\Message;
-use Mulagent\Message\MessageRole;
-use Tests\Mock\FakeStringTool;
+use MulAgent\Message\Message;
+use MulAgent\Message\MessageRole;
+use Tests\Mock\FakeTool;
 
 it('should handle not mapped tool', function () {
     $llm = createFakeOpenAILLM([
@@ -31,7 +31,8 @@ it('should handle not mapped tool', function () {
         ->and($response->results[2]->toolOutput)->toBeNull()
         ->and($response->results[2]->message)
         ->content->toBe('Response after tool call')
-        ->role->toBe(MessageRole::ASSISTANT);
+        ->role->toBe(MessageRole::ASSISTANT)
+        ->and($response->getContent())->toBe('Response after tool call');
 });
 
 it('should handle mapped tool returning a string', function () {
@@ -46,7 +47,7 @@ it('should handle mapped tool returning a string', function () {
             'content' => 'Response after tool call',
         ]),
     ]);
-    $agent = createFakeAgent('Lorenzo', $llm, null, [new FakeStringTool('my_tool')]);
+    $agent = createFakeAgent('Lorenzo', $llm, null, [new FakeTool('my_tool')]);
     $agentRunner = createFakeAgentRunner([$agent]);
     $response = $agentRunner->run([Message::user('My message')]);
     expect($response->results)->toHaveLength(3)
@@ -61,7 +62,8 @@ it('should handle mapped tool returning a string', function () {
         ->and($response->results[2]->toolOutput)->toBeNull()
         ->and($response->results[2]->message)
         ->content->toBe('Response after tool call')
-        ->role->toBe(MessageRole::ASSISTANT);
+        ->role->toBe(MessageRole::ASSISTANT)
+        ->and($response->getContent())->toBe('Response after tool call');
 });
 
 it('should handle mapped tool returning an agent', function () {
@@ -69,7 +71,7 @@ it('should handle mapped tool returning an agent', function () {
         createFakeOpenAIChatResponse([
             'content' => 'Run this tool!',
             'tool_id' => 'call_1',
-            'tool_name' => 'Andrea',
+            'tool_name' => 'transfer_to_andrea',
         ]),
         createFakeOpenAIChatResponse([
             'content' => 'Response after tool call',
@@ -91,7 +93,8 @@ it('should handle mapped tool returning an agent', function () {
         ->and($response->results[2]->toolOutput)->toBeNull()
         ->and($response->results[2]->message)
         ->content->toBe('Response after tool call')
-        ->role->toBe(MessageRole::ASSISTANT);
+        ->role->toBe(MessageRole::ASSISTANT)
+        ->and($response->getContent())->toBe('Response after tool call');
 });
 
 it('should bounce agent to agent', function () {
@@ -99,12 +102,12 @@ it('should bounce agent to agent', function () {
         createFakeOpenAIChatResponse([
             'content' => 'Andrea tool',
             'tool_id' => 'call_1',
-            'tool_name' => 'Andrea',
+            'tool_name' => 'transfer_to_andrea',
         ]),
         createFakeOpenAIChatResponse([
             'content' => 'Lorenzo tool',
             'tool_id' => 'call_2',
-            'tool_name' => 'Lorenzo',
+            'tool_name' => 'transfer_to_lorenzo',
         ]),
         createFakeOpenAIChatResponse([
             'content' => 'Response after tool calls',
@@ -129,5 +132,6 @@ it('should bounce agent to agent', function () {
         ->role->toBe(MessageRole::TOOL)
         ->and($response->results[4]->message)
         ->content->toBe('Response after tool calls')
-        ->role->toBe(MessageRole::ASSISTANT);
+        ->role->toBe(MessageRole::ASSISTANT)
+        ->and($response->getContent())->toBe('Response after tool calls');
 });

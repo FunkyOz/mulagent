@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Mock;
 
-use Mulagent\Tool\ToolCall;
-use Mulagent\Tool\ToolDefinition;
-use Mulagent\Tool\ToolInterface;
-use Mulagent\Tool\ToolOutput;
-use Mulagent\Utility\Utility;
+use MulAgent\Tool\ToolCall;
+use MulAgent\Tool\ToolDefinition;
+use MulAgent\Tool\ToolInterface;
+use MulAgent\Tool\ToolOutput;
 
-class FakeStringTool implements ToolInterface
+class FakeTool implements ToolInterface
 {
     public function __construct(readonly string $name)
     {
@@ -23,7 +22,7 @@ class FakeStringTool implements ToolInterface
 
     public function run(ToolCall $toolCall): ToolOutput
     {
-        $strParameters = Utility::jsonEncode($toolCall->arguments);
+        $strParameters = json_encode($toolCall->arguments, JSON_THROW_ON_ERROR);
         return new ToolOutput(
             'Tool output with parameters: '.$strParameters,
             $toolCall->name,
