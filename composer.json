@@ -52,9 +52,9 @@
         }
     },
     "scripts": {
-        "lint": "pint -v",
-        "tests:lint": "pint --test -v",
-        "tests:types": "phpstan analyse --ansi",
+        "lint": "pint -v --config ./pint.json",
+        "tests:lint": "pint --test -v --config ./pint.json",
+        "tests:types": "phpstan analyse -c ./phpstan.neon.dist --ansi",
         "tests:unit": "pest --colors=always",
         "tests": [
             "@tests:lint",
