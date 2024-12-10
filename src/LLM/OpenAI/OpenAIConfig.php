@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MulAgent\LLM\OpenAI;
 
-use MulAgent\Validation\Assert;
 use OpenAI\Contracts\ClientContract;
 
 final class OpenAIConfig
@@ -50,15 +49,6 @@ final class OpenAIConfig
         $baseUrl = $config['base_url'] ?? null;
         $headers = $config['headers'] ?? [];
         $client = $config['client'] ?? null;
-        Assert::lazy()
-            ->that($model, 'model')->string()->notEmpty()
-            ->that($temperature, 'temperature')->nullOr()->integer()->between(0, 2)
-            ->that($apiKey, 'api_key')->nullOr()->string()->notEmpty()
-            ->that($organization, 'organization')->nullOr()->string()->notEmpty()
-            ->that($baseUrl, 'base_url')->nullOr()->url()
-            ->that($headers, 'headers')->isArray()
-            ->that($client, 'client')->nullOr()->isInstanceOf(ClientContract::class)
-            ->verifyNow();
         return new self($model, $temperature, $apiKey, $organization, $baseUrl, $headers, $client);
     }
 }

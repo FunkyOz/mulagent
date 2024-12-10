@@ -1,7 +1,5 @@
 <?php
 
-use MulAgent\Exceptions\AssertionException;
-use MulAgent\Exceptions\LazyAssertionException;
 use MulAgent\LLM\OpenAI\OpenAIConfig;
 use OpenAI\Contracts\ClientContract;
 use OpenAI\Testing\ClientFake;
@@ -42,28 +40,12 @@ it('should parse openai config with client', function () {
 })->throwsNoExceptions();
 
 it('should throw assertion exception', function () {
-    try {
-        OpenAIConfig::create([
-            'model' => 1,
-            'api_key' => true,
-            'temperature' => 3,
-            'organization' => 7.6,
-            'base_url' => 'not an url',
-            'headers' => new stdClass(),
-        ]);
-    } catch (Throwable $e) {
-        expect($e)->toBeInstanceOf(LazyAssertionException::class)
-            ->getErrorExceptions()
-            ->each
-            ->toBeInstanceOf(AssertionException::class);
-        $errors = array_map(fn (AssertionException $ex) => (string) $ex, $e->getErrorExceptions());
-        expect($errors)->toEqual([
-            'Value "1" expected to be string, type integer given.',
-            'Provided "3" is neither greater than or equal to "0" nor less than or equal to "2".',
-            'Value "<TRUE>" expected to be string, type boolean given.',
-            'Value "7.6" expected to be string, type double given.',
-            'Value "not an url" was expected to be a valid URL starting with http or https',
-            'Value "stdClass" is not an array.',
-        ]);
-    }
-});
+    OpenAIConfig::create([
+        'model' => 1,
+        'api_key' => true,
+        'temperature' => 3,
+        'organization' => 7.6,
+        'base_url' => 'not an url',
+        'headers' => new stdClass(),
+    ]);
+})->throws(TypeError::class);
