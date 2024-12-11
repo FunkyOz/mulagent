@@ -17,7 +17,7 @@ use OpenAI\Contracts\ClientContract;
 
 final class OpenAILLM implements LLMInterface
 {
-    private readonly ClientContract $client;
+    private ClientContract $client;
 
     private readonly string $model;
 
