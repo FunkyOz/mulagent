@@ -28,5 +28,4 @@ class FakeTool implements ToolInterface
             $toolCall->name,
         );
     }
-
 }
