@@ -1,18 +1,26 @@
-<p align="center">
+<p style="text-align: center;">
     <img src="https://raw.githubusercontent.com/FunkyOz/mulagent/main/docs/mulagent-screen.jpg" height="300" alt="MulAgent">
-    <p align="center">
-        <a href="https://github.com/FunkyOz/mulagent/actions"><img alt="GitHub Workflow Status (main)" src="https://img.shields.io/github/workflow/status/FunkyOz/mulagent/Tests/main"></a>
-        <a href="https://packagist.org/packages/FunkyOz/mulagent"><img alt="Total Downloads" src="https://img.shields.io/packagist/dt/FunkyOz/mulagent"></a>
-        <a href="https://packagist.org/packages/FunkyOz/mulagent"><img alt="Latest Version" src="https://img.shields.io/packagist/v/FunkyOz/mulagent"></a>
-        <a href="https://packagist.org/packages/FunkyOz/mulagent"><img alt="License" src="https://img.shields.io/packagist/l/FunkyOz/mulagent"></a>
+    <p style="text-align: center;">
+        <a href="https://github.com/FunkyOz/mulagent/actions">
+            <img alt="GitHub Tests (main)" src="https://img.shields.io/github/actions/workflow/status/funkyoz/mulagent/tests.yml?branch=main">
+        </a>
+        <a href="https://packagist.org/packages/FunkyOz/mulagent">
+            <img alt="Downloads" src="https://img.shields.io/packagist/dt/funkyoz/mulagent">
+        </a>
+        <a href="https://packagist.org/packages/FunkyOz/mulagent">
+            <img alt="Latest Version" src="https://img.shields.io/packagist/v/funkyoz/mulagent">
+        </a>
+        <a href="https://packagist.org/packages/FunkyOz/mulagent">
+            <img alt="License" src="https://img.shields.io/packagist/l/funkyoz/mulagent">
+        </a>
     </p>
 </p>
 
 ------
-This package provides a simple Multi-Agent implementation of an LLM application in PHP.
-Inspired by [OpenAI Swarm](https://github.com/openai/swarm) python.
 
-For now only support OpenAI api
+This package provides a simple Multi-Agent implementation of an LLM application in PHP.
+Inspired by [OpenAI Swarm](https://github.com/openai/swarm).
+Support only OpenAI api
 
 > **Requires [PHP 8.1+](https://php.net/releases/)**
 
@@ -97,7 +105,7 @@ $otherAgent = new Agent(
     name: 'My agent', 
     llm: $llm,
 );
-$firstAgent->tools = [
+$activeAgent->tools = [
     new AgentTool(
         agent: $otherAgent,                           // The agent to use as tool. 
         toolName: 'other_agent',                      // The tool's name. if omitted, the agent name will be used.
@@ -105,7 +113,7 @@ $firstAgent->tools = [
     )
 ]; 
 
-$mulAgent = new MulAgent($firstAgent);
+$mulAgent = new MulAgent($activeAgent);
 
 $messages = [Message::user('Hi!')];
 $response = $mulAgent->run(
@@ -182,5 +190,5 @@ $response = $mulAgent->run(
 );
 ```
 
-**MulAgent** was created by **[Lorenzo Dessimoni](https://github.com/FunkyOz)** under the *
-*[MIT license](https://opensource.org/licenses/MIT)**.
+**MulAgent** was created by **[Lorenzo Dessimoni](https://github.com/FunkyOz)** under the 
+**[MIT license](https://opensource.org/licenses/MIT)**.
