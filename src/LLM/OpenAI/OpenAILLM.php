@@ -6,8 +6,9 @@ namespace MulAgent\LLM\OpenAI;
 
 use JsonException;
 use MulAgent\Exceptions\ExceptionFactory;
-use MulAgent\LLM\LLMInterface;
+use MulAgent\LLM\LLM;
 use MulAgent\LLM\LLMResult;
+use MulAgent\Message\Content;
 use MulAgent\Message\Message;
 use MulAgent\Tool\ToolCall;
 use MulAgent\Tool\ToolDefinition;
@@ -15,7 +16,7 @@ use MulAgent\Tool\ToolFormatter;
 use OpenAI;
 use OpenAI\Contracts\ClientContract;
 
-final class OpenAILLM implements LLMInterface
+final class OpenAILLM implements LLM
 {
     private ClientContract $client;
 
@@ -29,9 +30,9 @@ final class OpenAILLM implements LLMInterface
             $this->client = $config->client;
         } else {
             $factory = OpenAI::factory()
-                ->withApiKey($config?->apiKey ?? (getenv('OPENAI_API_KEY') ?: ''))
-                ->withBaseUri($config?->baseUrl ?? (getenv('OPENAI_BASE_URL') ?: ''))
-                ->withOrganization($config?->organization ?? (getenv('OPENAI_ORGANIZATION') ?: ''));
+                ->withApiKey($config?->apiKey ?? '')
+                ->withBaseUri($config?->baseUrl ?? '')
+                ->withOrganization($config?->organization);
             $headers = $config?->headers ?? [];
             if (count($headers) > 0) {
                 foreach ($headers as $name => $value) {
@@ -40,7 +41,7 @@ final class OpenAILLM implements LLMInterface
             }
             $this->client = $factory->make();
         }
-        $this->model = $config?->model ?? 'gpt-4o';
+        $this->model = $config?->model ?? 'gpt-4o-mini';
         $this->temperature = $config?->temperature;
     }
 
@@ -59,7 +60,7 @@ final class OpenAILLM implements LLMInterface
             $parameters['temperature'] = $this->temperature;
         }
         if (count($messages) > 0) {
-            $parameters['messages'] = self::mapMessagesToArray($messages);
+            $parameters['messages'] = self::mapToOpenAIMessages($messages);
         }
         if (count($tools) > 0) {
             $parameters['tools'] = array_map(
@@ -68,37 +69,44 @@ final class OpenAILLM implements LLMInterface
             );
         }
         $response = $this->client->chat()->create($parameters);
-        if (!isset($response->choices[0])) {
-            throw ExceptionFactory::createInvalidResponseException('Error: invalid response choice');
+        $choices = $response->choices;
+        if (count($choices) !== 1) {
+            throw ExceptionFactory::createInvalidResponseException('Error: invalid response choices');
         }
+        $choice = end($choices);
         $toolCalls = [];
-        foreach ($response->choices[0]->message->toolCalls as $toolCall) {
+        $rawToolCalls = [];
+        foreach ($choice->message->toolCalls as $toolCall) {
+            $rawToolCalls[] = $toolCall->toArray();
             $toolCalls[] = new ToolCall(
                 $toolCall->id,
                 $toolCall->function->name,
                 (array)json_decode($toolCall->function->arguments, true, 512, JSON_THROW_ON_ERROR),
             );
         }
-
+        $additionalArgs = count($rawToolCalls) > 0 ? ['tool_calls' => $rawToolCalls] : [];
         return new LLMResult(
-            Message::assistant($response->choices[0]->message->content ?? ''),
+            Message::assistant($choice->message->content ?? '', $additionalArgs),
             $toolCalls
         );
     }
 
     /**
      * @param  array<Message>  $messages
-     * @return array<array{ role: string, content: string, tool_call_id?: string }>
+     * @return array<mixed>
      */
-    private static function mapMessagesToArray(array $messages): array
+    private static function mapToOpenAIMessages(array $messages): array
     {
         return array_map(function (Message $message): array {
             $openAIMessage = [
                 'role' => $message->role->value,
-                'content' => $message->content,
+                'content' => array_map(fn (Content $content) => [
+                    'type' => $content->getType()->value,
+                    $content->getType()->value => $content->getValue()
+                ], $message->content),
             ];
-            if ($message->isTool()) {
-                $openAIMessage['tool_call_id'] = $message->toolId ?? '';
+            if (count($message->additionalArgs) > 0) {
+                $openAIMessage = array_merge($openAIMessage, $message->additionalArgs);
             }
             return $openAIMessage;
         }, $messages);

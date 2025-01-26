@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MulAgent\Tool;
 
-interface ToolInterface
+interface Tool
 {
     public function getDefinition(): ToolDefinition;
 

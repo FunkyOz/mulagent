@@ -7,7 +7,7 @@ namespace MulAgent\LLM;
 use MulAgent\Message\Message;
 use MulAgent\Tool\ToolCall;
 
-class LLMResult
+final class LLMResult
 {
     /**
      * @param  Message  $message

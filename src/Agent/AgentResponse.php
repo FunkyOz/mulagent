@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace MulAgent\Agent;
 
-class AgentResponse
+use Stringable;
+
+final class AgentResponse implements Stringable
 {
     /**
      * @param  array<AgentResult>  $results
@@ -16,11 +18,23 @@ class AgentResponse
     ) {
     }
 
-    public function getContent(): string
+    public function toString(): string
     {
-        if (!isset($this->results[count($this->results) - 1])) {
+        $results = $this->results;
+        if (count($results) === 0) {
             return '';
         }
-        return $this->results[count($this->results) - 1]->message->content;
+        $result = end($results);
+        $content = $result->message->content;
+        if (count($content) === 0) {
+            return '';
+        }
+        $content = end($content);
+        return $content->getValue();
+    }
+
+    public function __toString(): string
+    {
+        return $this->toString();
     }
 }

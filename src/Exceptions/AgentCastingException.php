@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace MulAgent\Exceptions;
 
-class AgentCastingException extends MulagentException
+final class AgentCastingException extends MulagentException
 {
 }

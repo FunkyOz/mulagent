@@ -7,8 +7,8 @@ use OpenAI\Testing\ClientFake;
 it('should parse openai config without client', function (array $config) {
     $openAIConfig = OpenAIConfig::create($config);
     expect($openAIConfig)
-        ->model->toBe($config['model'] ?? 'gpt-4o')
-        ->apiKey->toBe($config['api_key'] ?? null)
+        ->model->toBe($config['model'] ?? 'gpt-4o-mini')
+        ->apiKey->toBe($config['api_key'] ?? '')
         ->temperature->toBe($config['temperature'] ?? null)
         ->organization->toBe($config['organization'] ?? null)
         ->baseUrl->toBe($config['base_url'] ?? null)

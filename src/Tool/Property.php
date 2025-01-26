@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MulAgent\Tool;
 
-class Property
+final class Property
 {
     /**
      * @param  string  $type

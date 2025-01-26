@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace MulAgent\Exceptions;
 
-class ToolFormatException extends MulagentException
+final class ToolFormatException extends MulagentException
 {
 }

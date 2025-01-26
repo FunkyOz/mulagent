@@ -6,10 +6,10 @@ namespace Tests\Mock;
 
 use MulAgent\Tool\ToolCall;
 use MulAgent\Tool\ToolDefinition;
-use MulAgent\Tool\ToolInterface;
+use MulAgent\Tool\Tool;
 use MulAgent\Tool\ToolOutput;
 
-class FakeTool implements ToolInterface
+class FakeTool implements Tool
 {
     public function __construct(readonly string $name)
     {

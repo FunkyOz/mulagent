@@ -10,8 +10,8 @@ final class OpenAIConfig
 {
     /**
      * @param  string  $model
+     * @param  string  $apiKey
      * @param  int|null  $temperature
-     * @param  string|null  $apiKey
      * @param  string|null  $organization
      * @param  string|null  $baseUrl
      * @param  array<string, string>  $headers
@@ -19,8 +19,8 @@ final class OpenAIConfig
      */
     private function __construct(
         readonly string $model,
+        readonly string $apiKey,
         readonly ?int $temperature = null,
-        readonly ?string $apiKey = null,
         readonly ?string $organization = null,
         readonly ?string $baseUrl = null,
         readonly array $headers = [],
@@ -42,13 +42,13 @@ final class OpenAIConfig
      */
     public static function create(array $config = []): OpenAIConfig
     {
-        $model = $config['model'] ?? 'gpt-4o';
+        $model = $config['model'] ?? 'gpt-4o-mini';
+        $apiKey = $config['api_key'] ?? (getenv('OPENAI_API_KEY') ?: '');
         $temperature = $config['temperature'] ?? null;
-        $apiKey = $config['api_key'] ?? null;
-        $organization = $config['organization'] ?? null;
-        $baseUrl = $config['base_url'] ?? null;
+        $organization = $config['organization'] ?? (getenv('OPENAI_ORGANIZATION') ?: null);
+        $baseUrl = $config['base_url'] ?? (getenv('OPENAI_BASE_URL') ?: null);
         $headers = $config['headers'] ?? [];
         $client = $config['client'] ?? null;
-        return new self($model, $temperature, $apiKey, $organization, $baseUrl, $headers, $client);
+        return new self($model, $apiKey, $temperature, $organization, $baseUrl, $headers, $client);
     }
 }

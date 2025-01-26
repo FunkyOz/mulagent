@@ -22,17 +22,17 @@ it('should handle not mapped tool', function () {
     expect($response->results)->toHaveLength(3)
         ->and($response->results[0]->toolOutput)->toBeNull()
         ->and($response->results[0]->message)
-        ->content->toBe('Run this tool!')
+        ->content->{0}->text->toBe('Run this tool!')
         ->role->toBe(MessageRole::ASSISTANT)
         ->and($response->results[1]->toolOutput)->toBeNull()
         ->and($response->results[1]->message)
-        ->content->toBe('Error: Tool "not_found_tool" not found.')
+        ->content->{0}->text->toBe('Error: Tool "not_found_tool" not found.')
         ->role->toBe(MessageRole::TOOL)
         ->and($response->results[2]->toolOutput)->toBeNull()
         ->and($response->results[2]->message)
-        ->content->toBe('Response after tool call')
+        ->content->{0}->text->toBe('Response after tool call')
         ->role->toBe(MessageRole::ASSISTANT)
-        ->and($response->getContent())->toBe('Response after tool call');
+        ->and($response->toString())->toBe('Response after tool call');
 });
 
 it('should handle mapped tool returning a string', function () {
@@ -53,17 +53,17 @@ it('should handle mapped tool returning a string', function () {
     expect($response->results)->toHaveLength(3)
         ->and($response->results[0]->toolOutput)->toBeNull()
         ->and($response->results[0]->message)
-        ->content->toBe('Run this tool!')
+        ->content->{0}->text->toBe('Run this tool!')
         ->role->toBe(MessageRole::ASSISTANT)
         ->and($response->results[1]->toolOutput)->not->toBeNull()
         ->and($response->results[1]->message)
-        ->content->toBe('Tool output with parameters: {"param":123}')
+        ->content->{0}->text->toBe('Tool output with parameters: {"param":123}')
         ->role->toBe(MessageRole::TOOL)
         ->and($response->results[2]->toolOutput)->toBeNull()
         ->and($response->results[2]->message)
-        ->content->toBe('Response after tool call')
+        ->content->{0}->text->toBe('Response after tool call')
         ->role->toBe(MessageRole::ASSISTANT)
-        ->and($response->getContent())->toBe('Response after tool call');
+        ->and($response->toString())->toBe('Response after tool call');
 });
 
 it('should handle mapped tool returning an agent', function () {
@@ -84,17 +84,17 @@ it('should handle mapped tool returning an agent', function () {
     expect($response->results)->toHaveLength(3)
         ->and($response->results[0]->toolOutput)->toBeNull()
         ->and($response->results[0]->message)
-        ->content->toBe('Run this tool!')
+        ->content->{0}->text->toBe('Run this tool!')
         ->role->toBe(MessageRole::ASSISTANT)
         ->and($response->results[1]->toolOutput)->not->toBeNull()
         ->and($response->results[1]->message)
-        ->content->toBe('assistant: Andrea')
+        ->content->{0}->text->toBe('assistant: Andrea')
         ->role->toBe(MessageRole::TOOL)
         ->and($response->results[2]->toolOutput)->toBeNull()
         ->and($response->results[2]->message)
-        ->content->toBe('Response after tool call')
+        ->content->{0}->text->toBe('Response after tool call')
         ->role->toBe(MessageRole::ASSISTANT)
-        ->and($response->getContent())->toBe('Response after tool call');
+        ->and($response->toString())->toBe('Response after tool call');
 });
 
 it('should bounce agent to agent', function () {
@@ -119,19 +119,19 @@ it('should bounce agent to agent', function () {
     $response = $agentRunner->run([Message::user('My message')]);
     expect($response->results)->toHaveLength(5)
         ->and($response->results[0]->message)
-        ->content->toBe('Andrea tool')
+        ->content->{0}->text->toBe('Andrea tool')
         ->role->toBe(MessageRole::ASSISTANT)
         ->and($response->results[1]->message)
-        ->content->toBe('assistant: Andrea')
+        ->content->{0}->text->toBe('assistant: Andrea')
         ->role->toBe(MessageRole::TOOL)
         ->and($response->results[2]->message)
-        ->content->toBe('Lorenzo tool')
+        ->content->{0}->text->toBe('Lorenzo tool')
         ->role->toBe(MessageRole::ASSISTANT)
         ->and($response->results[3]->message)
-        ->content->toBe('assistant: Lorenzo')
+        ->content->{0}->text->toBe('assistant: Lorenzo')
         ->role->toBe(MessageRole::TOOL)
         ->and($response->results[4]->message)
-        ->content->toBe('Response after tool calls')
+        ->content->{0}->text->toBe('Response after tool calls')
         ->role->toBe(MessageRole::ASSISTANT)
-        ->and($response->getContent())->toBe('Response after tool calls');
+        ->and($response->toString())->toBe('Response after tool calls');
 });

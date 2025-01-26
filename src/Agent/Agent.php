@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace MulAgent\Agent;
 
-use MulAgent\LLM\LLMInterface;
-use MulAgent\Tool\ToolInterface;
+use MulAgent\LLM\LLM;
+use MulAgent\Tool\Tool;
 
 final class Agent
 {
     /**
      * @param  non-empty-string  $name
-     * @param  LLMInterface  $llm
+     * @param  LLM  $llm
      * @param  string|null  $instruction
-     * @param  array<ToolInterface>  $tools
+     * @param  array<Tool>  $tools
      */
     public function __construct(
         readonly string $name,
-        readonly LLMInterface $llm,
+        readonly LLM $llm,
         readonly ?string $instruction = null,
         public array $tools = [],
     ) {

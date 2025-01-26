@@ -8,9 +8,9 @@ use MulAgent\Agent\Agent;
 use MulAgent\Agent\AgentResponse;
 use MulAgent\Agent\AgentResult;
 use MulAgent\Message\Message;
+use MulAgent\Tool\Tool;
 use MulAgent\Tool\ToolCall;
 use MulAgent\Tool\ToolDefinition;
-use MulAgent\Tool\ToolInterface;
 
 final class MulAgent
 {
@@ -20,7 +20,7 @@ final class MulAgent
 
     /**
      * @param  array<ToolCall>  $toolCalls
-     * @param  array<string, ToolInterface>  $toolMap
+     * @param  array<string, Tool>  $toolMap
      * @return array{0: array<AgentResult>, 1: Agent|null}
      */
     private static function handleToolCalls(
@@ -33,12 +33,16 @@ final class MulAgent
             if (!isset($toolMap[$toolCall->name])) {
                 $message = Message::tool(
                     sprintf('Error: Tool "%s" not found.', $toolCall->name),
-                    $toolCall->id
+                    [
+                        'tool_call_id' => $toolCall->id
+                    ]
                 );
                 $agentResults[] = new AgentResult($message);
             } else {
                 $toolOutput = $toolMap[$toolCall->name]->run($toolCall);
-                $message = Message::tool($toolOutput->content, $toolCall->id);
+                $message = Message::tool($toolOutput->content, [
+                    'tool_call_id' => $toolCall->id
+                ]);
                 if ($toolOutput->isAgent()) {
                     $activeAgent = $toolOutput->asAgent();
                 }
@@ -77,10 +81,10 @@ final class MulAgent
             if (count($llmResult->toolCalls) === 0 || !$executeTools) {
                 break;
             }
-            [$partialAgentResults, $partialAgent] = self::handleToolCalls($llmResult->toolCalls, $toolMap);
-            $partialMessages = array_map(fn (AgentResult $result) => $result->message, $partialAgentResults);
+            [$partialResults, $partialAgent] = self::handleToolCalls($llmResult->toolCalls, $toolMap);
+            $partialMessages = array_map(fn (AgentResult $result) => $result->message, $partialResults);
             $history = array_merge($history, $partialMessages);
-            $agentResults = array_merge($agentResults, $partialAgentResults);
+            $agentResults = array_merge($agentResults, $partialResults);
             if (null !== $partialAgent) {
                 $activeAgent = $partialAgent;
             }
@@ -89,8 +93,8 @@ final class MulAgent
     }
 
     /**
-     * @param  array<ToolInterface>  $tools
-     * @return array{0: array<string, ToolInterface>, 1: array<ToolDefinition>}
+     * @param  array<Tool>  $tools
+     * @return array{0: array<string, Tool>, 1: array<ToolDefinition>}
      */
     private static function parseToolMap(array $tools): array
     {

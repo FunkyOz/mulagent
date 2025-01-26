@@ -7,7 +7,7 @@ namespace MulAgent\Agent;
 use MulAgent\Message\Message;
 use MulAgent\Tool\ToolOutput;
 
-class AgentResult
+final class AgentResult
 {
     public function __construct(
         readonly Message $message,

@@ -6,7 +6,7 @@ namespace MulAgent\Tool;
 
 use MulAgent\Agent\Agent;
 
-final class AgentTool implements ToolInterface
+final class AgentTool implements Tool
 {
     public function __construct(
         readonly Agent $agent,

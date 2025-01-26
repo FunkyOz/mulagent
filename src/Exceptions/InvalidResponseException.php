@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace MulAgent\Exceptions;
 
-class InvalidResponseException extends MulagentException
+final class InvalidResponseException extends MulagentException
 {
 }

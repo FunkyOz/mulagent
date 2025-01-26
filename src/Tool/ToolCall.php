@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MulAgent\Tool;
 
-class ToolCall
+final class ToolCall
 {
     /**
      * @param  string  $id

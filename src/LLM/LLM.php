@@ -7,7 +7,7 @@ namespace MulAgent\LLM;
 use MulAgent\Message\Message;
 use MulAgent\Tool\ToolDefinition;
 
-interface LLMInterface
+interface LLM
 {
     /**
      * @param  array<Message>  $messages

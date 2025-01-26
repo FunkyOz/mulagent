@@ -6,7 +6,7 @@ namespace MulAgent\Tool;
 
 use MulAgent\Exceptions\ExceptionFactory;
 
-class ToolFormatter
+final class ToolFormatter
 {
     /**
      * @param  ToolDefinition  $toolInfo

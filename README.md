@@ -76,7 +76,7 @@ $response = $mulAgent->run(
     executeTools: true,                                      // A boolean value using to enable or disable tool executions.
 );
 
-$content = $response->getContent();                          // The response as string after all routines and hadoffs was completed.
+$content = $response->toString();                          // The response as string after all routines and hadoffs was completed.
 $response->activeAgent;                                      // The last agent responded.
 $response->results;                                          // A list of result object, composed by a message and an eventual tool output.
 $response->results[0]->message;                              // The message of a result.
@@ -128,11 +128,11 @@ $response = $mulAgent->run(
 ```php
 use MulAgent\Tool\ToolCall;
 use MulAgent\Tool\ToolDefinition;
-use MulAgent\Tool\ToolInterface;
+use MulAgent\Tool\Tool;
 use MulAgent\Tool\ToolOutput;
 use MulAgent\Tool\Property;
 
-class MyTool implements ToolInterface
+class MyTool implements Tool
 {
     public function getDefinition(): ToolDefinition
     {
