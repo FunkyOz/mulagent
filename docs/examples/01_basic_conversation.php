@@ -53,10 +53,10 @@ $conversation = [
 // Process each message and get responses
 foreach ($conversation as $message) {
     echo "\nUser: " . $message->content . "\n";
-    
+
     // Run the agent and get its response
     $response = $mulAgent->run([$message]);
-    
+
     // Print the agent's response
     echo "Assistant: " . $response . "\n";
-} 
+}

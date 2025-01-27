@@ -14,7 +14,7 @@ use MulAgent\MulAgent;
 // First, let's create a simple weather tool
 $weatherTool = new class () {
     public string $name = 'weather';
-    
+
     private array $mockWeather = [
         'London' => ['temp' => 15, 'condition' => 'cloudy'],
         'Paris' => ['temp' => 18, 'condition' => 'sunny'],
@@ -105,4 +105,4 @@ foreach ($conversation as $message) {
     echo "\nUser: " . $message->content . "\n";
     $response = $mulAgent->run([$message]);
     echo "Assistant: " . $response . "\n";
-} 
+}
