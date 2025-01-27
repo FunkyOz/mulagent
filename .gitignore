@@ -7,3 +7,5 @@
 *.swp
 *.swo
 .phpunit.cache/
+.idea/
+.vscode/
