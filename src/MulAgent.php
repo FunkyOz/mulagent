@@ -21,7 +21,7 @@ final class MulAgent
 
     /**
      * @param  array<ToolCall>  $toolCalls
-     * @param  array<string, callable-object>  $toolMap
+     * @param  array<string, callable&object>  $toolMap
      * @return array{0: array<Message>, 1: Agent|null}
      */
     private static function handleToolCalls(array $toolCalls, array $toolMap): array
@@ -95,8 +95,8 @@ final class MulAgent
     }
 
     /**
-     * @param  array<callable-object>  $tools
-     * @return array<string, callable-object>
+     * @param  array<callable&object>  $tools
+     * @return array<string, callable&object>
      */
     private static function parseToolMap(array $tools): array
     {

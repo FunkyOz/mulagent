@@ -11,7 +11,7 @@ use MulAgent\Tool\AgentTool;
 final class Agent
 {
     /**
-     * @var array<callable-object>
+     * @var array<callable&object>
      */
     private array $tools = [];
 
@@ -19,7 +19,7 @@ final class Agent
      * @param  non-empty-string  $name
      * @param  LLM  $llm
      * @param  string|null  $instruction
-     * @param  array<callable-object|Agent>  $tools  Objects that must implement __invoke() method
+     * @param  array<int, (callable&object)|Agent>  $tools  Objects that must implement __invoke() method
      */
     public function __construct(
         readonly string $name,
@@ -31,7 +31,7 @@ final class Agent
     }
 
     /**
-     * @param  array<callable-object|Agent>  $tools
+     * @param  array<int, (callable&object)|Agent>  $tools
      * @return void
      */
     public function addTools(array $tools): void
@@ -41,7 +41,7 @@ final class Agent
     }
 
     /**
-     * @return array<callable-object>
+     * @return array<int, (callable&object)>
      */
     public function getTools(): array
     {
@@ -49,8 +49,8 @@ final class Agent
     }
 
     /**
-     * @param  callable-object|Agent  $tool
-     * @return callable-object
+     * @param  (callable&object)|Agent  $tool
+     * @return callable&object
      */
     private static function ensureTool(mixed $tool)
     {

@@ -46,7 +46,7 @@ final class OpenAILLM implements LLM
 
     /**
      * @param  array<Message>  $messages
-     * @param  array<callable-object>  $tools
+     * @param  array<callable&object>  $tools
      *
      * @throws JsonException
      */

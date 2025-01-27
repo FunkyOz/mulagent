@@ -18,7 +18,7 @@ use ReflectionUnionType;
 final class ToolFormatter
 {
     /**
-     * @param  callable-object  $tool
+     * @param  callable&object  $tool
      * @return array<string, mixed>
      */
     public static function formatToolAsJsonSchema($tool): array
@@ -54,7 +54,7 @@ final class ToolFormatter
     }
 
     /**
-     * @param  ReflectionClass<callable-object>  $reflectionClass
+     * @param  ReflectionClass<callable&object>  $reflectionClass
      * @return ReflectionMethod
      */
     private static function ensureFunctor(ReflectionClass $reflectionClass): ReflectionMethod
@@ -66,7 +66,7 @@ final class ToolFormatter
     }
 
     /**
-     * @param  callable-object  $tool
+     * @param  callable&object  $tool
      * @return non-empty-string
      */
     public static function getName($tool): string

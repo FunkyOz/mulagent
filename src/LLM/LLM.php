@@ -10,7 +10,7 @@ interface LLM
 {
     /**
      * @param  array<Message>  $messages
-     * @param  array<callable-object>  $tools
+     * @param  array<callable&object>  $tools
      * @return LLMResult
      */
     public function chat(array $messages = [], array $tools = []): LLMResult;
