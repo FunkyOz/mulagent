@@ -1,7 +1,7 @@
 {
     "name": "funkyoz/mulagent",
-    "version": "1.0.0",
-    "description": "Handle llm multi agent pattern",
+    "version": "2.0.0",
+    "description": "LLM multi agent library",
     "keywords": [
         "php",
         "llm",
@@ -54,6 +54,7 @@
         "lint": "pint -v --config ./pint.json",
         "tests:lint": "pint --test -v --config ./pint.json",
         "tests:types": "phpstan analyse -c ./phpstan.neon.dist --ansi",
+        "tests:type": "@tests:types",
         "tests:unit": "pest --colors=always",
         "tests": [
             "@tests:lint",

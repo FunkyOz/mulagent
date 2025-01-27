@@ -1,26 +1,16 @@
 <?php
 
-use MulAgent\LLM\OpenAI\OpenAIConfig;
 use MulAgent\LLM\OpenAI\OpenAILLM;
 use MulAgent\Message\Message;
 use MulAgent\Message\MessageRole;
 use MulAgent\Message\TextContent;
-use OpenAI\Responses\Chat\CreateResponse;
-use OpenAI\Testing\ClientFake;
+use MulAgent\Tool\ToolCall;
 
 it('should create openai llm', function () {
-    $config = OpenAIConfig::create([
-        'client' => new ClientFake([
-            CreateResponse::fake([
-                'choices' => [
-                    [
-                        'message' => [
-                            'content' => 'My test!',
-                        ]
-                    ]
-                ]
-            ])
-        ])
+    $config = createFakeOpenAIConfig([
+        createFakeOpenAIChatResponse([
+            'content' => 'My test!',
+        ]),
     ]);
     $llm = new OpenAILLM($config);
     $result = $llm->chat();
@@ -45,4 +35,23 @@ it('should expect text content', function () {
     expect($result->message)
         ->content->{0}->text->toBe('Test response')
         ->role->toBe(MessageRole::ASSISTANT);
+});
+
+it('should respond with tool call', function () {
+    $config = createFakeOpenAIConfig([
+        createFakeOpenAIChatResponse([
+            'content' => null,
+            'tool_id' => 'call_1',
+            'tool_name' => 'not_found_tool',
+            'tool_args' => ['param' => 123],
+        ]),
+    ]);
+    $llm = new OpenAILLM($config);
+    $result = $llm->chat([Message::user('Test response')]);
+    expect($result->toolCalls)->toHaveLength(1)
+        ->and($result->toolCalls)
+        ->{0}->toBeInstanceOf(ToolCall::class)
+        ->{0}->id->toBe('call_1')
+        ->{0}->name->toBe('not_found_tool')
+        ->{0}->arguments->toMatchArray(['param' => 123]);
 });

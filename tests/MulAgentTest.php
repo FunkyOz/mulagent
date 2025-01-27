@@ -19,19 +19,14 @@ it('should handle not mapped tool', function () {
     $agent = createFakeAgent('Lorenzo', $llm);
     $agentRunner = createFakeAgentRunner([$agent]);
     $response = $agentRunner->run([Message::user('My message')]);
-    expect($response->results)->toHaveLength(3)
-        ->and($response->results[0]->toolOutput)->toBeNull()
-        ->and($response->results[0]->message)
-        ->content->{0}->text->toBe('Run this tool!')
-        ->role->toBe(MessageRole::ASSISTANT)
-        ->and($response->results[1]->toolOutput)->toBeNull()
-        ->and($response->results[1]->message)
-        ->content->{0}->text->toBe('Error: Tool "not_found_tool" not found.')
-        ->role->toBe(MessageRole::TOOL)
-        ->and($response->results[2]->toolOutput)->toBeNull()
-        ->and($response->results[2]->message)
-        ->content->{0}->text->toBe('Response after tool call')
-        ->role->toBe(MessageRole::ASSISTANT)
+    expect($response->messages)->toHaveLength(3)
+        ->and($response->messages)
+        ->{0}->content->{0}->text->toBe('Run this tool!')
+        ->{0}->role->toBe(MessageRole::ASSISTANT)
+        ->{1}->content->{0}->text->toBe('Error: Tool "not_found_tool" not found.')
+        ->{1}->role->toBe(MessageRole::TOOL)
+        ->{2}->content->{0}->text->toBe('Response after tool call')
+        ->{2}->role->toBe(MessageRole::ASSISTANT)
         ->and($response->toString())->toBe('Response after tool call');
 });
 
@@ -40,29 +35,24 @@ it('should handle mapped tool returning a string', function () {
         createFakeOpenAIChatResponse([
             'content' => 'Run this tool!',
             'tool_id' => 'call_1',
-            'tool_name' => 'my_tool',
-            'tool_args' => ['param' => 123],
+            'tool_name' => 'fake_tool',
+            'tool_args' => ['param2' => '321', 'param1' => 123],
         ]),
         createFakeOpenAIChatResponse([
             'content' => 'Response after tool call',
         ]),
     ]);
-    $agent = createFakeAgent('Lorenzo', $llm, null, [new FakeTool('my_tool')]);
+    $agent = createFakeAgent('Lorenzo', $llm, null, [new FakeTool()]);
     $agentRunner = createFakeAgentRunner([$agent]);
     $response = $agentRunner->run([Message::user('My message')]);
-    expect($response->results)->toHaveLength(3)
-        ->and($response->results[0]->toolOutput)->toBeNull()
-        ->and($response->results[0]->message)
-        ->content->{0}->text->toBe('Run this tool!')
-        ->role->toBe(MessageRole::ASSISTANT)
-        ->and($response->results[1]->toolOutput)->not->toBeNull()
-        ->and($response->results[1]->message)
-        ->content->{0}->text->toBe('Tool output with parameters: {"param":123}')
-        ->role->toBe(MessageRole::TOOL)
-        ->and($response->results[2]->toolOutput)->toBeNull()
-        ->and($response->results[2]->message)
-        ->content->{0}->text->toBe('Response after tool call')
-        ->role->toBe(MessageRole::ASSISTANT)
+    expect($response->messages)->toHaveLength(3)
+        ->and($response->messages)
+        ->{0}->content->{0}->text->toBe('Run this tool!')
+        ->{0}->role->toBe(MessageRole::ASSISTANT)
+        ->{1}->content->{0}->text->toBe('Params passed: param1=123, param2=321')
+        ->{1}->role->toBe(MessageRole::TOOL)
+        ->{2}->content->{0}->text->toBe('Response after tool call')
+        ->{2}->role->toBe(MessageRole::ASSISTANT)
         ->and($response->toString())->toBe('Response after tool call');
 });
 
@@ -71,7 +61,7 @@ it('should handle mapped tool returning an agent', function () {
         createFakeOpenAIChatResponse([
             'content' => 'Run this tool!',
             'tool_id' => 'call_1',
-            'tool_name' => 'transfer_to_andrea',
+            'tool_name' => 'transfer_to_andrea_agent',
         ]),
         createFakeOpenAIChatResponse([
             'content' => 'Response after tool call',
@@ -81,19 +71,14 @@ it('should handle mapped tool returning an agent', function () {
     $andreaAgent = createFakeAgent('Andrea', $llm);
     $agentRunner = createFakeAgentRunner([$lorenzoAgent, $andreaAgent]);
     $response = $agentRunner->run([Message::user('My message')]);
-    expect($response->results)->toHaveLength(3)
-        ->and($response->results[0]->toolOutput)->toBeNull()
-        ->and($response->results[0]->message)
-        ->content->{0}->text->toBe('Run this tool!')
-        ->role->toBe(MessageRole::ASSISTANT)
-        ->and($response->results[1]->toolOutput)->not->toBeNull()
-        ->and($response->results[1]->message)
-        ->content->{0}->text->toBe('assistant: Andrea')
-        ->role->toBe(MessageRole::TOOL)
-        ->and($response->results[2]->toolOutput)->toBeNull()
-        ->and($response->results[2]->message)
-        ->content->{0}->text->toBe('Response after tool call')
-        ->role->toBe(MessageRole::ASSISTANT)
+    expect($response->messages)->toHaveLength(3)
+        ->and($response->messages)
+        ->{0}->content->{0}->text->toBe('Run this tool!')
+        ->{0}->role->toBe(MessageRole::ASSISTANT)
+        ->{1}->content->{0}->text->toBe('successfully transferred')
+        ->{1}->role->toBe(MessageRole::TOOL)
+        ->{2}->content->{0}->text->toBe('Response after tool call')
+        ->{2}->role->toBe(MessageRole::ASSISTANT)
         ->and($response->toString())->toBe('Response after tool call');
 });
 
@@ -102,12 +87,12 @@ it('should bounce agent to agent', function () {
         createFakeOpenAIChatResponse([
             'content' => 'Andrea tool',
             'tool_id' => 'call_1',
-            'tool_name' => 'transfer_to_andrea',
+            'tool_name' => 'transfer_to_andrea_agent',
         ]),
         createFakeOpenAIChatResponse([
             'content' => 'Lorenzo tool',
             'tool_id' => 'call_2',
-            'tool_name' => 'transfer_to_lorenzo',
+            'tool_name' => 'transfer_to_lorenzo_agent',
         ]),
         createFakeOpenAIChatResponse([
             'content' => 'Response after tool calls',
@@ -117,21 +102,17 @@ it('should bounce agent to agent', function () {
     $andreaAgent = createFakeAgent('Andrea', $fakeLLM);
     $agentRunner = createFakeAgentRunner([$lorenzoAgent, $andreaAgent]);
     $response = $agentRunner->run([Message::user('My message')]);
-    expect($response->results)->toHaveLength(5)
-        ->and($response->results[0]->message)
-        ->content->{0}->text->toBe('Andrea tool')
-        ->role->toBe(MessageRole::ASSISTANT)
-        ->and($response->results[1]->message)
-        ->content->{0}->text->toBe('assistant: Andrea')
-        ->role->toBe(MessageRole::TOOL)
-        ->and($response->results[2]->message)
-        ->content->{0}->text->toBe('Lorenzo tool')
-        ->role->toBe(MessageRole::ASSISTANT)
-        ->and($response->results[3]->message)
-        ->content->{0}->text->toBe('assistant: Lorenzo')
-        ->role->toBe(MessageRole::TOOL)
-        ->and($response->results[4]->message)
-        ->content->{0}->text->toBe('Response after tool calls')
-        ->role->toBe(MessageRole::ASSISTANT)
+    expect($response->messages)->toHaveLength(5)
+        ->and($response->messages)
+        ->{0}->content->{0}->text->toBe('Andrea tool')
+        ->{0}->role->toBe(MessageRole::ASSISTANT)
+        ->{1}->content->{0}->text->toBe('successfully transferred')
+        ->{1}->role->toBe(MessageRole::TOOL)
+        ->{2}->content->{0}->text->toBe('Lorenzo tool')
+        ->{2}->role->toBe(MessageRole::ASSISTANT)
+        ->{3}->content->{0}->text->toBe('successfully transferred')
+        ->{3}->role->toBe(MessageRole::TOOL)
+        ->{4}->content->{0}->text->toBe('Response after tool calls')
+        ->{4}->role->toBe(MessageRole::ASSISTANT)
         ->and($response->toString())->toBe('Response after tool calls');
 });

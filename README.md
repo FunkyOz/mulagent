@@ -78,9 +78,9 @@ $response = $mulAgent->run(
 
 $content = $response->toString();                          // The response as string after all routines and hadoffs was completed.
 $response->activeAgent;                                      // The last agent responded.
-$response->results;                                          // A list of result object, composed by a message and an eventual tool output.
-$response->results[0]->message;                              // The message of a result.
-$response->results[0]->toolOutput;                           // If there were any tool calls this variable contain the output used by the llm.
+$response->messages;                                          // A list of result object, composed by a message and an eventual tool output.
+$response->messages[0]->message;                              // The message of a result.
+$response->messages[0]->toolOutput;                           // If there were any tool calls this variable contain the output used by the llm.
 ```
 
 **Agent transfers the conversation to another**
@@ -91,7 +91,7 @@ use MulAgent\LLM\OpenAI\OpenAIConfig;
 use MulAgent\LLM\OpenAI\OpenAILLM;
 use MulAgent\Message\Message;
 use MulAgent\MulAgent;
-use MulAgent\Tool\AgentTool;
+use MulAgent\Tool\AgentToolOld;
 
 $firstAgent = new Agent(
     name: 'My agent', 
@@ -106,7 +106,7 @@ $otherAgent = new Agent(
     llm: $llm,
 );
 $activeAgent->tools = [
-    new AgentTool(
+    new AgentToolOld(
         agent: $otherAgent,                           // The agent to use as tool. 
         toolName: 'other_agent',                      // The tool's name. if omitted, the agent name will be used.
         toolDescription: 'Description of other agent' // The tool's description used to help the llm.
@@ -128,11 +128,11 @@ $response = $mulAgent->run(
 ```php
 use MulAgent\Tool\ToolCall;
 use MulAgent\Tool\ToolDefinition;
-use MulAgent\Tool\Tool;
+use MulAgent\Tool\ToolOld;
 use MulAgent\Tool\ToolOutput;
 use MulAgent\Tool\Property;
 
-class MyTool implements Tool
+class MyTool implements ToolOld
 {
     public function getDefinition(): ToolDefinition
     {

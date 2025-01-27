@@ -4,28 +4,29 @@ declare(strict_types=1);
 
 namespace MulAgent\Agent;
 
+use MulAgent\Message\Message;
 use Stringable;
 
 final class AgentResponse implements Stringable
 {
     /**
-     * @param  array<AgentResult>  $results
+     * @param  array<Message>  $messages
      * @param  Agent  $activeAgent
      */
     public function __construct(
-        readonly array $results,
+        readonly array $messages,
         readonly Agent $activeAgent
     ) {
     }
 
     public function toString(): string
     {
-        $results = $this->results;
-        if (count($results) === 0) {
+        $messages = $this->messages;
+        if (count($messages) === 0) {
             return '';
         }
-        $result = end($results);
-        $content = $result->message->content;
+        $message = end($messages);
+        $content = $message->content;
         if (count($content) === 0) {
             return '';
         }

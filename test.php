@@ -1,163 +1,67 @@
 <?php
 
 use MulAgent\Agent\Agent;
-use MulAgent\Agent\AgentResult;
 use MulAgent\LLM\OpenAI\OpenAIConfig;
 use MulAgent\LLM\OpenAI\OpenAILLM;
 use MulAgent\Message\Message;
 use MulAgent\MulAgent;
-use MulAgent\Tool\Property;
-use MulAgent\Tool\Tool;
-use MulAgent\Tool\ToolCall;
-use MulAgent\Tool\ToolDefinition;
-use MulAgent\Tool\ToolOutput;
 
 include __DIR__.'/vendor/autoload.php';
 
-$addTool = new class () implements Tool {
-    public function getDefinition(): ToolDefinition
-    {
-        return new ToolDefinition(
-            name: 'add',
-            description: 'Makes mathematical additions',
-            properties: [
-                new Property(
-                    type: 'number',
-                    name: 'first',
-                ),
-                new Property(
-                    type: 'number',
-                    name: 'second',
-                )
-            ],
-            required: ['first', 'second'],
-        );
-    }
+$addTool = new class () {
+    public string $name = 'add';
 
-    public function run(ToolCall $toolCall): ToolOutput
+    public function __invoke(float $first, float $second): string
     {
-        if (!isset($toolCall->arguments['first']) || !isset($toolCall->arguments['second'])) {
-            throw new InvalidArgumentException('Add tool expect exactly two arguments');
-        }
-        $first = $toolCall->arguments['first'];
-        $second = $toolCall->arguments['second'];
-
-        return new ToolOutput(
-            content: (string)($first + $second),
-            toolName: $toolCall->name,
-        );
+        return (string)($first + $second);
     }
 };
 
-$subTool = new class () implements Tool {
-    public function getDefinition(): ToolDefinition
-    {
-        return new ToolDefinition(
-            name: 'sub',
-            description: 'Makes mathematical subtractions',
-            properties: [
-                new Property(
-                    type: 'number',
-                    name: 'first',
-                ),
-                new Property(
-                    type: 'number',
-                    name: 'second',
-                )
-            ],
-            required: ['first', 'second'],
-        );
-    }
+$subTool = new class () {
+    public string $name = 'sub';
 
-    public function run(ToolCall $toolCall): ToolOutput
+    public function __invoke(float $first, float $second): string
     {
-        if (!isset($toolCall->arguments['first']) || !isset($toolCall->arguments['second'])) {
-            throw new InvalidArgumentException('Sub tool expect exactly two arguments');
-        }
-        $first = $toolCall->arguments['first'];
-        $second = $toolCall->arguments['second'];
-
-        return new ToolOutput(
-            content: (string)($first - $second),
-            toolName: $toolCall->name,
-        );
+        return (string)($first - $second);
     }
 };
 
-$mulTool = new class () implements Tool {
-    public function getDefinition(): ToolDefinition
-    {
-        return new ToolDefinition(
-            name: 'mul',
-            description: 'Makes mathematical multiplications',
-            properties: [
-                new Property(
-                    type: 'number',
-                    name: 'first',
-                ),
-                new Property(
-                    type: 'number',
-                    name: 'second',
-                )
-            ],
-            required: ['first', 'second'],
-        );
-    }
+$mulTool = new class () {
+    public string $name = 'mul';
 
-    public function run(ToolCall $toolCall): ToolOutput
+    public function __invoke(float $first, float $second): string
     {
-        if (!isset($toolCall->arguments['first']) || !isset($toolCall->arguments['second'])) {
-            throw new InvalidArgumentException('Mul tool expect exactly two arguments');
-        }
-        $first = $toolCall->arguments['first'];
-        $second = $toolCall->arguments['second'];
-
-        return new ToolOutput(
-            content: (string)($first * $second),
-            toolName: $toolCall->name,
-        );
+        return (string)($first * $second);
     }
 };
 
-$divTool = new class () implements Tool {
-    public function getDefinition(): ToolDefinition
-    {
-        return new ToolDefinition(
-            name: 'div',
-            description: 'Makes mathematical divisions',
-            properties: [
-                new Property(
-                    type: 'number',
-                    name: 'first',
-                ),
-                new Property(
-                    type: 'number',
-                    name: 'second',
-                )
-            ],
-            required: ['first', 'second'],
-        );
-    }
+$divTool = new class () {
+    public string $name = 'div';
 
-    public function run(ToolCall $toolCall): ToolOutput
+    public function __invoke(float $first, float $second): string
     {
-        if (!isset($toolCall->arguments['first']) || !isset($toolCall->arguments['second'])) {
-            throw new InvalidArgumentException('Div tool expect exactly two arguments');
-        }
-        $first = $toolCall->arguments['first'];
-        $second = $toolCall->arguments['second'];
-        if ($second === 0) {
-            throw new InvalidArgumentException('Unable to divide by 0');
+        if (.0 === $second) {
+            return 'Unable to divide by 0';
         }
 
-        return new ToolOutput(
-            content: (string)($first / $second),
-            toolName: $toolCall->name,
-        );
+        return (string)($first / $second);
     }
 };
 
-$config = OpenAIConfig::create();
+$defaultConfig = [];
+if ($baseUrl = getenv('BASE_URL')) {
+    $defaultConfig['base_url'] = $baseUrl;
+}
+if ($apiKey = getenv('OPENAI_API_KEY')) {
+    $defaultConfig['api_key'] = $apiKey;
+}
+if ($heliconeApiKey = getenv('HELICONE_API_KEY')) {
+    $defaultConfig['headers'] = [
+        'Helicone-Auth' => 'Bearer '.$heliconeApiKey
+    ];
+}
+
+$config = OpenAIConfig::create($defaultConfig);
 $llm = new OpenAILLM($config);
 
 $agent = new Agent(
@@ -177,7 +81,7 @@ while (true) {
     readline_add_history($line);
     $history[] = Message::user($line);
     $response = $runner->run($history);
-    $history = array_merge($history, array_map(fn (AgentResult $result) => $result->message, $response->results));
+    $history = array_merge($history, $response->messages);
     echo $response.PHP_EOL.PHP_EOL;
     $firstPrompt = null;
 }

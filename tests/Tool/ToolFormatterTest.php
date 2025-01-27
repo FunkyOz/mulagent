@@ -1,162 +1,73 @@
 <?php
 
-use MulAgent\Tool\Property;
 use MulAgent\Tool\ToolFormatter;
-use MulAgent\Tool\ToolDefinition;
 
-it('should format property', function (Property $property, array $expected) {
-    expect(ToolFormatter::formatProperty($property))
-        ->toMatchArray($expected);
-})->with([
-    [
-        new Property(
-            'object',
-            'my_property',
-            'This is my property',
-            [],
-            null,
-            [new Property('number', 'foo_property')]
-        ),
-        [
-            'my_property' => [
-                'type' => 'object',
-                'description' => 'This is my property',
-                'properties' => ['foo_property' => ['type' => 'number']],
-            ],
-        ],
-    ],
-    [
-        new Property(
-            'array',
-            'my_property',
-            null,
-            [],
-            'int',
-        ),
-        [
-            'my_property' => [
-                'type' => 'array',
-                'items' => ['type' => 'int']
-            ],
-        ],
-    ],
-    [
-        new Property(
-            'string',
-            'my_property',
-        ),
-        [
-            'my_property' => [
-                'type' => 'string',
-            ],
-        ],
-    ],
-    [
-        new Property(
-            'string',
-            'my_property',
-            null,
-            [],
-            null,
-            [],
-            'date-time'
-        ),
-        [
-            'my_property' => [
-                'type' => 'string',
-                'format' => 'date-time'
-            ],
-        ],
-    ],
-]);
+it('should parse anonymous tool', function () {
+    enum TestIntEnum: int
+    {
+        case TEST = 0;
+    }
 
-it('should format tool as json schema', function () {
-    $toolInfo = new ToolDefinition(
-        'my_tool',
-        'Description of my tool',
-        [
-            new Property(
-                'string',
-                'parameter_1',
-            ),
-            new Property(
-                'array',
-                'parameter_2',
-                'This is my second parameter',
-                [],
-                'int',
-            ),
-            new Property(
-                'object',
-                'parameter_3',
-                'This is my third parameter',
-                [],
-                null,
-                [
-                    new Property(
-                        'number',
-                        'parameter_3_1',
-                    ),
-                    new Property(
-                        'string',
-                        'parameter_3_2',
-                        null,
-                        [],
-                        null,
-                        [],
-                        'hostname'
-                    ),
-                ]
-            ),
-            new Property(
-                'string',
-                'parameter_4',
-                'This is my fourth parameter',
-                ['one', 'two', 'three'],
-            ),
-        ],
-        ['parameter_1', 'parameter_4']
-    );
+    enum TestStringEnum: string
+    {
+        case TEST = 'test';
+    }
 
-    $expected = [
-        'type' => 'function',
-        'function' => [
-            'name' => 'my_tool',
-            'description' => 'Description of my tool',
-            'strict' => true,
-            'parameters' => [
-                'type' => 'object',
-                'properties' => [
-                    'parameter_1' => [
-                        'type' => 'string',
-                    ],
-                    'parameter_2' => [
-                        'type' => 'array',
-                        'description' => 'This is my second parameter',
-                        'items' => [
-                            'type' => 'int',
-                        ],
-                    ],
-                    'parameter_3' => [
-                        'type' => 'object',
-                        'description' => 'This is my third parameter',
-                        'properties' => [
-                            'parameter_3_1' => ['type' => 'number'],
-                            'parameter_3_2' => ['type' => 'string', 'format' => 'hostname'],
-                        ],
-                    ],
-                    'parameter_4' => [
-                        'type' => 'string',
-                        'description' => 'This is my fourth parameter',
-                        'enum' => ['one', 'two', 'three'],
-                    ],
-                ],
-                'required' => ['parameter_1', 'parameter_4'],
-                'additionalProperties' => false,
-            ],
-        ],
-    ];
+    enum TestEnum
+    {
+        case TEST;
+    }
 
-    expect(ToolFormatter::formatToolDefinitionAsJsonSchema($toolInfo))
-        ->toMatchArray($expected);
+    class Test
+    {
+        public function __construct(
+            public string $name,
+            public int $integer,
+            public bool $boolean,
+            public float $float,
+            public ?TestStringEnum $stringEnum,
+        ) {
+        }
+    }
+
+    $myClass = new class () {
+        public function __construct(
+            public readonly string $name = 'test',
+            public readonly string $description = 'Tool description',
+        ) {
+        }
+
+        /**
+         * @param  Test  $test The test description
+         * @param  string  $myString The myString work as
+         *                           a valid string type with description
+         * @param  TestEnum  $myEnum
+         * @param  TestIntEnum|null  $myIntEnum
+         * @return void
+         */
+        public function __invoke(
+            Test $test,
+            string $myString,
+            TestEnum $myEnum,
+            ?TestIntEnum $myIntEnum,
+        ) {
+        }
+    };
+    $schema = ToolFormatter::formatToolAsJsonSchema($myClass);
+
+    $expected = json_decode(file_get_contents(__DIR__.'/datasource/json_schema.json'), true);
+
+    expect($schema)->toMatchArray($expected);
 });
+
+it('should format json schema name', function (string $name, string $expected) {
+    expect(ToolFormatter::formatJsonSchemaName($name))->toBe($expected);
+})->with([
+    ['test', 'test'],
+    ['testAgent', 'test_agent'],
+    ['TestAgent', 'test_agent'],
+    ['Test_Agent', 'test_agent'],
+    ['anotherTest_Agent', 'another_test_agent'],
+    ['123anotherTest_Agent', '123another_test_agent'],
+    ['Test-agent', 'test_agent'],
+]);

@@ -10,9 +10,8 @@ use MulAgent\LLM\LLM;
 use MulAgent\LLM\LLMResult;
 use MulAgent\Message\Content;
 use MulAgent\Message\Message;
-use MulAgent\Tool\ToolCall;
-use MulAgent\Tool\ToolDefinition;
 use MulAgent\Tool\ToolFormatter;
+use MulAgent\Tool\ToolCall;
 use OpenAI;
 use OpenAI\Contracts\ClientContract;
 
@@ -47,7 +46,7 @@ final class OpenAILLM implements LLM
 
     /**
      * @param  array<Message>  $messages
-     * @param  array<ToolDefinition>  $tools
+     * @param  array<callable-object>  $tools
      *
      * @throws JsonException
      */
@@ -64,7 +63,7 @@ final class OpenAILLM implements LLM
         }
         if (count($tools) > 0) {
             $parameters['tools'] = array_map(
-                fn (ToolDefinition $tool) => ToolFormatter::formatToolDefinitionAsJsonSchema($tool),
+                fn (object $tool) => ToolFormatter::formatToolAsJsonSchema($tool),
                 $tools
             );
         }

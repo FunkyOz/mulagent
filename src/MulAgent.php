@@ -6,11 +6,12 @@ namespace MulAgent;
 
 use MulAgent\Agent\Agent;
 use MulAgent\Agent\AgentResponse;
-use MulAgent\Agent\AgentResult;
 use MulAgent\Message\Message;
-use MulAgent\Tool\Tool;
+use MulAgent\Tool\ToolFormatter;
 use MulAgent\Tool\ToolCall;
-use MulAgent\Tool\ToolDefinition;
+use RuntimeException;
+use Stringable;
+use Throwable;
 
 final class MulAgent
 {
@@ -20,36 +21,38 @@ final class MulAgent
 
     /**
      * @param  array<ToolCall>  $toolCalls
-     * @param  array<string, Tool>  $toolMap
-     * @return array{0: array<AgentResult>, 1: Agent|null}
+     * @param  array<string, callable-object>  $toolMap
+     * @return array{0: array<Message>, 1: Agent|null}
      */
-    private static function handleToolCalls(
-        array $toolCalls,
-        array $toolMap,
-    ): array {
-        $agentResults = [];
+    private static function handleToolCalls(array $toolCalls, array $toolMap): array
+    {
+        $messages = [];
         $activeAgent = null;
         foreach ($toolCalls as $toolCall) {
             if (!isset($toolMap[$toolCall->name])) {
                 $message = Message::tool(
                     sprintf('Error: Tool "%s" not found.', $toolCall->name),
-                    [
-                        'tool_call_id' => $toolCall->id
-                    ]
+                    ['tool_call_id' => $toolCall->id]
                 );
-                $agentResults[] = new AgentResult($message);
             } else {
-                $toolOutput = $toolMap[$toolCall->name]->run($toolCall);
-                $message = Message::tool($toolOutput->content, [
-                    'tool_call_id' => $toolCall->id
-                ]);
-                if ($toolOutput->isAgent()) {
-                    $activeAgent = $toolOutput->asAgent();
+                try {
+                    $output = $toolMap[$toolCall->name](...$toolCall->arguments);
+                    if ($output instanceof Agent) {
+                        $activeAgent = $output;
+                        $output = 'successfully transferred';
+                    } elseif ($output instanceof Stringable) {
+                        $output = $output->__toString();
+                    } elseif (!is_string($output)) {
+                        throw new RuntimeException();
+                    }
+                } catch (Throwable $ex) {
+                    $output = sprintf('Run tool "%s" failed: %s', $toolCall->name, $ex->getMessage());
                 }
-                $agentResults[] = new AgentResult($message, $toolOutput);
+                $message = Message::tool($output, ['tool_call_id' => $toolCall->id]);
             }
+            $messages[] = $message;
         }
-        return [$agentResults, $activeAgent];
+        return [$messages, $activeAgent];
     }
 
     /**
@@ -63,7 +66,7 @@ final class MulAgent
         int $maxTurns = PHP_INT_MAX,
         bool $executeTools = true
     ): AgentResponse {
-        $agentResults = [];
+        $agentMessages = [];
         $activeAgent = $this->agent;
         $history = $messages;
         if ($activeAgent->instruction !== null && $activeAgent->instruction !== '') {
@@ -74,36 +77,33 @@ final class MulAgent
         }
         $historyInitLen = count($history);
         while (count($history) - $historyInitLen < $maxTurns) {
-            [$toolMap, $tools] = self::parseToolMap($activeAgent->tools);
-            $llmResult = $activeAgent->llm->chat($history, $tools);
+            $toolMap = self::parseToolMap($activeAgent->getTools());
+            $llmResult = $activeAgent->llm->chat($history, $activeAgent->getTools());
             $history[] = $llmResult->message;
-            $agentResults[] = new AgentResult($llmResult->message);
+            $agentMessages[] = $llmResult->message;
             if (count($llmResult->toolCalls) === 0 || !$executeTools) {
                 break;
             }
-            [$partialResults, $partialAgent] = self::handleToolCalls($llmResult->toolCalls, $toolMap);
-            $partialMessages = array_map(fn (AgentResult $result) => $result->message, $partialResults);
+            [$partialMessages, $partialAgent] = self::handleToolCalls($llmResult->toolCalls, $toolMap);
             $history = array_merge($history, $partialMessages);
-            $agentResults = array_merge($agentResults, $partialResults);
+            $agentMessages = array_merge($agentMessages, $partialMessages);
             if (null !== $partialAgent) {
                 $activeAgent = $partialAgent;
             }
         }
-        return new AgentResponse($agentResults, $activeAgent);
+        return new AgentResponse($agentMessages, $activeAgent);
     }
 
     /**
-     * @param  array<Tool>  $tools
-     * @return array{0: array<string, Tool>, 1: array<ToolDefinition>}
+     * @param  array<callable-object>  $tools
+     * @return array<string, callable-object>
      */
     private static function parseToolMap(array $tools): array
     {
-        $toolInfos = [];
         $toolMap = [];
         foreach ($tools as $tool) {
-            $toolInfos[] = $tool->getDefinition();
-            $toolMap[$tool->getDefinition()->name] = $tool;
+            $toolMap[ToolFormatter::getName($tool)] = $tool;
         }
-        return [$toolMap, $toolInfos];
+        return $toolMap;
     }
 }

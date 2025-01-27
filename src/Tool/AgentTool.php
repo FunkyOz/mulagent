@@ -6,30 +6,24 @@ namespace MulAgent\Tool;
 
 use MulAgent\Agent\Agent;
 
-final class AgentTool implements Tool
+final class AgentTool
 {
+    public readonly string $name;
+    public readonly string $description;
+
+
     public function __construct(
-        readonly Agent $agent,
-        private readonly ?string $toolName = null,
-        private readonly ?string $toolDescription = null,
+        private readonly Agent $agent,
+        ?string $name = null,
+        ?string $description = null
     ) {
+        $name ??= $this->agent->name;
+        $this->name = 'transfer_to_'.ToolFormatter::formatJsonSchemaName($name).'_agent';
+        $this->description = $description ?? 'Transfer the conversation to agent '.$name;
     }
 
-    public function getDefinition(): ToolDefinition
+    public function __invoke(): Agent
     {
-        $agentName = preg_replace('/[^a-z0-9]+/', '_', mb_strtolower($this->agent->name));
-        return new ToolDefinition(
-            $this->toolName ?? 'transfer_to_'.$agentName,
-            $this->toolDescription ?? 'Transfer the conversation to agent '.$this->agent->name,
-        );
-    }
-
-    public function run(ToolCall $toolCall): ToolOutput
-    {
-        return new ToolOutput(
-            'assistant: '.$this->agent->name,
-            $toolCall->name,
-            $this->agent,
-        );
+        return $this->agent;
     }
 }

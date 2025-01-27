@@ -1,10 +1,9 @@
 <?php
 
 use MulAgent\Agent\Agent;
-use MulAgent\MulAgent;
 use MulAgent\LLM\OpenAI\OpenAIConfig;
 use MulAgent\LLM\OpenAI\OpenAILLM;
-use MulAgent\Tool\AgentTool;
+use MulAgent\MulAgent;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI\Testing\ClientFake;
 
@@ -41,17 +40,19 @@ function createFakeOpenAILLM(array $responses): OpenAILLM
 
 function createFakeAgent(string $name, OpenAILLM $llm, ?string $instructions = null, array $tools = []): Agent
 {
-    $agent = new Agent($name, $llm, $instructions, $tools);
-    $agent->tools = $tools;
-    return $agent;
+    return new Agent($name, $llm, $instructions, $tools);
 }
 
+/**
+ * @param  array<Agent>  $agents
+ * @return MulAgent
+ */
 function createFakeAgentRunner(array $agents): MulAgent
 {
     foreach ($agents as $agent1) {
         foreach ($agents as $agent2) {
             if ($agent1->name !== $agent2->name) {
-                $agent1->tools = array_merge($agent1->tools, [new AgentTool($agent2)]);
+                $agent1->addTools([$agent2]);
             }
         }
     }
