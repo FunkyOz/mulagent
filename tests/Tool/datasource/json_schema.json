@@ -3,6 +3,7 @@
     "function": {
         "name": "test",
         "description": "Tool description",
+        "strict": true,
         "parameters": {
             "type": "object",
             "properties": {

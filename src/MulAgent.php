@@ -6,10 +6,10 @@ namespace MulAgent;
 
 use MulAgent\Agent\Agent;
 use MulAgent\Agent\AgentResponse;
+use MulAgent\Exceptions\ExceptionFactory;
 use MulAgent\Message\Message;
 use MulAgent\Tool\ToolFormatter;
 use MulAgent\Tool\ToolCall;
-use RuntimeException;
 use Stringable;
 use Throwable;
 
@@ -42,8 +42,10 @@ final class MulAgent
                         $output = 'successfully transferred';
                     } elseif ($output instanceof Stringable) {
                         $output = $output->__toString();
-                    } elseif (!is_string($output)) {
-                        throw new RuntimeException();
+                    } elseif (is_scalar($output)) {
+                        $output = (string) $output;
+                    } else {
+                        throw ExceptionFactory::createToolExecutionException('Tool output must be a valid Stringable object or a scalar type');
                     }
                 } catch (Throwable $ex) {
                     $output = sprintf('Run tool "%s" failed: %s', $toolCall->name, $ex->getMessage());

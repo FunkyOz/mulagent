@@ -14,6 +14,7 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionType;
 use ReflectionUnionType;
+use stdClass;
 
 final class ToolFormatter
 {
@@ -26,6 +27,7 @@ final class ToolFormatter
         $reflectionClass = new ReflectionClass($tool);
         $invokeMethod = self::ensureFunctor($reflectionClass);
         $schema = [
+            'strict' => true,
             'name' => self::getName($tool),
         ];
         if (property_exists($tool, 'description')) {
@@ -43,7 +45,7 @@ final class ToolFormatter
         }
         $schema['parameters'] = [
             'type' => 'object',
-            'properties' => $properties,
+            'properties' => count($properties) > 0 ? $properties : new stdClass(),
             'required' => $required,
             'additionalProperties' => false,
         ];

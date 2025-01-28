@@ -10,10 +10,11 @@ use MulAgent\LLM\LLM;
 use MulAgent\LLM\LLMResult;
 use MulAgent\Message\Content;
 use MulAgent\Message\Message;
-use MulAgent\Tool\ToolFormatter;
 use MulAgent\Tool\ToolCall;
+use MulAgent\Tool\ToolFormatter;
 use OpenAI;
 use OpenAI\Contracts\ClientContract;
+use Throwable;
 
 final class OpenAILLM implements LLM
 {
@@ -21,7 +22,7 @@ final class OpenAILLM implements LLM
 
     private readonly string $model;
 
-    private readonly ?int $temperature;
+    private readonly ?float $temperature;
 
     public function __construct(?OpenAIConfig $config = null)
     {
@@ -63,11 +64,15 @@ final class OpenAILLM implements LLM
         }
         if (count($tools) > 0) {
             $parameters['tools'] = array_map(
-                fn (object $tool) => ToolFormatter::formatToolAsJsonSchema($tool),
+                fn ($tool) => ToolFormatter::formatToolAsJsonSchema($tool),
                 $tools
             );
         }
-        $response = $this->client->chat()->create($parameters);
+        try {
+            $response = $this->client->chat()->create($parameters);
+        } catch (Throwable $ex) {
+            throw ExceptionFactory::createLLMBadRequestException($ex->getMessage(), $parameters);
+        }
         $choices = $response->choices;
         if (count($choices) !== 1) {
             throw ExceptionFactory::createInvalidResponseException('Error: invalid response choices');

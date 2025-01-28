@@ -11,7 +11,7 @@ final class OpenAIConfig
     /**
      * @param  string  $model
      * @param  string  $apiKey
-     * @param  int|null  $temperature
+     * @param  float|null  $temperature
      * @param  string|null  $organization
      * @param  string|null  $baseUrl
      * @param  array<string, string>  $headers
@@ -20,7 +20,7 @@ final class OpenAIConfig
     private function __construct(
         readonly string $model,
         readonly string $apiKey,
-        readonly ?int $temperature = null,
+        readonly ?float $temperature = null,
         readonly ?string $organization = null,
         readonly ?string $baseUrl = null,
         readonly array $headers = [],
@@ -31,7 +31,7 @@ final class OpenAIConfig
     /**
      * @param  array{
      *     model?: string|null,
-     *     temperature?: int|null,
+     *     temperature?: float|null,
      *     api_key?: string|null,
      *     organization?: string|null,
      *     base_url?: string|null,

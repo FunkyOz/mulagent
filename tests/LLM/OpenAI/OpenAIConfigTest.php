@@ -19,7 +19,7 @@ it('should parse openai config without client', function (array $config) {
         [
             'model' => 'gpt-4o',
             'api_key' => 'foo',
-            'temperature' => 1,
+            'temperature' => 1.0,
             'organization' => 'org',
             'base_url' => 'http://localhost',
             'headers' => ['Content-Type' => 'application/json'],
