@@ -15,7 +15,7 @@ use Throwable;
 
 final class MulAgent
 {
-    public function __construct(private readonly Agent $agent)
+    public function __construct(private Agent $activeAgent)
     {
     }
 
@@ -36,7 +36,8 @@ final class MulAgent
                 );
             } else {
                 try {
-                    $output = $toolMap[$toolCall->name](...$toolCall->arguments);
+                    $tool = $toolMap[$toolCall->name];
+                    $output = $tool(...$toolCall->arguments);
                     if ($output instanceof Agent) {
                         $activeAgent = $output;
                         $output = 'successfully transferred';
@@ -69,31 +70,30 @@ final class MulAgent
         bool $executeTools = true
     ): AgentResponse {
         $agentMessages = [];
-        $activeAgent = $this->agent;
         $history = $messages;
-        if ($activeAgent->instruction !== null && $activeAgent->instruction !== '') {
-            $history = array_merge(
-                [Message::system($activeAgent->instruction)],
-                array_filter($history, fn (Message $message) => !$message->isSystem())
-            );
-        }
         $historyInitLen = count($history);
         while (count($history) - $historyInitLen < $maxTurns) {
-            $toolMap = self::parseToolMap($activeAgent->getTools());
-            $llmResult = $activeAgent->llm->chat($history, $activeAgent->getTools());
+            if (!empty($this->activeAgent->instruction)) {
+                $history = array_merge(
+                    [Message::system($this->activeAgent->instruction)],
+                    array_filter($history, fn (Message $message) => !$message->isSystem())
+                );
+            }
+            $toolMap = self::parseToolMap($this->activeAgent->getTools());
+            $llmResult = $this->activeAgent->llm->chat($history, $this->activeAgent->getTools());
             $history[] = $llmResult->message;
             $agentMessages[] = $llmResult->message;
             if (count($llmResult->toolCalls) === 0 || !$executeTools) {
                 break;
             }
-            [$partialMessages, $partialAgent] = self::handleToolCalls($llmResult->toolCalls, $toolMap);
+            [$partialMessages, $activeAgent] = self::handleToolCalls($llmResult->toolCalls, $toolMap);
             $history = array_merge($history, $partialMessages);
             $agentMessages = array_merge($agentMessages, $partialMessages);
-            if (null !== $partialAgent) {
-                $activeAgent = $partialAgent;
+            if (null !== $activeAgent) {
+                $this->activeAgent = $activeAgent;
             }
         }
-        return new AgentResponse($agentMessages, $activeAgent);
+        return new AgentResponse($agentMessages, $this->activeAgent);
     }
 
     /**
