@@ -5,18 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.0.0] - 2024-12-10
-- Initial release
-
-## [2.0.0] - 2025-01-27
-
 ### Added
 - Added some documentation and examples.
+- Tools as functors.
+- Agent handoff capability.
 
-### Changed
-- Changed the way tools are defined. Now tools are functors.
-
-### Removed
-- Removed old tools implementation.
-
+## [1.0.1] - 2025-01-27
 ### Fixed
 - Fixed agent handoff capability.
