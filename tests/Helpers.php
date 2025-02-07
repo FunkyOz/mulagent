@@ -1,13 +1,18 @@
 <?php
 
+use Anthropic\Responses\Messages\CreateResponse as AnthropicCreateResponse;
+use Anthropic\Testing\ClientFake as AnthropicClientFake;
 use MulAgent\Agent\Agent;
+use MulAgent\LLM\Anthropic\AnthropicConfig;
+use MulAgent\LLM\Anthropic\AnthropicLLM;
+use MulAgent\LLM\LLM;
 use MulAgent\LLM\OpenAI\OpenAIConfig;
 use MulAgent\LLM\OpenAI\OpenAILLM;
 use MulAgent\MulAgent;
-use OpenAI\Responses\Chat\CreateResponse;
-use OpenAI\Testing\ClientFake;
+use OpenAI\Responses\Chat\CreateResponse as OpenAICreateResponse;
+use OpenAI\Testing\ClientFake as OpenAIClientFake;
 
-function createFakeOpenAIChatResponse(array $response): CreateResponse
+function createFakeOpenAIChatResponse(array $response): OpenAICreateResponse
 {
     $message = [
         'content' => $response['content'] ?? null,
@@ -24,12 +29,12 @@ function createFakeOpenAIChatResponse(array $response): CreateResponse
             ]
         ];
     }
-    return CreateResponse::fake(['choices' => [['message' => $message]]]);
+    return OpenAICreateResponse::fake(['choices' => [['message' => $message]]]);
 }
 
 function createFakeOpenAIConfig(array $responses): OpenAIConfig
 {
-    return OpenAIConfig::create(['client' => new ClientFake($responses)]);
+    return OpenAIConfig::create(['client' => new OpenAIClientFake($responses)]);
 }
 
 function createFakeOpenAILLM(array $responses): OpenAILLM
@@ -38,7 +43,38 @@ function createFakeOpenAILLM(array $responses): OpenAILLM
     return new OpenAILLM($config);
 }
 
-function createFakeAgent(string $name, OpenAILLM $llm, ?string $instructions = null, array $tools = []): Agent
+function createFakeAnthropicChatResponse(array $response): AnthropicCreateResponse
+{
+    $content = [];
+    if (!empty($response['content'])) {
+        $content[] = [
+            'type' => 'text',
+            'text' => $response['content']
+        ];
+    }
+    if (isset($response['tool_id']) && isset($response['tool_name'])) {
+        $content[] = [
+            'type' => 'tool_use',
+            'id' => $response['tool_id'],
+            'name' => $response['tool_name'],
+            'input' => $response['tool_args'] ?? [],
+        ];
+    }
+    return AnthropicCreateResponse::fake(['content' => $content]);
+}
+
+function createFakeAnthropicConfig(array $responses): AnthropicConfig
+{
+    return AnthropicConfig::create(['client' => new AnthropicClientFake($responses)]);
+}
+
+function createFakeAnthropicLLM(array $responses): AnthropicLLM
+{
+    $config = createFakeAnthropicConfig($responses);
+    return new AnthropicLLM($config);
+}
+
+function createFakeAgent(string $name, LLM $llm, ?string $instructions = null, array $tools = []): Agent
 {
     return new Agent($name, $llm, $instructions, $tools);
 }

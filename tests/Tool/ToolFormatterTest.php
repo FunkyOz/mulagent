@@ -61,7 +61,7 @@ it('should parse anonymous tool', function () {
 });
 
 it('should format json schema name', function (string $name, string $expected) {
-    expect(ToolFormatter::formatJsonSchemaName($name))->toBe($expected);
+    expect(ToolFormatter::formatName($name))->toBe($expected);
 })->with([
     ['test', 'test'],
     ['testAgent', 'test_agent'],

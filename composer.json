@@ -19,6 +19,7 @@
     ],
     "require": {
         "php": "^8.1.0",
+        "ext-fileinfo": "*",
         "nyholm/psr7": "^1.8",
         "openai-php/client": "^0.10.3",
         "symfony/http-client": "^6.4"
@@ -26,9 +27,14 @@
     "require-dev": {
         "laravel/pint": "^1.2.0",
         "mockery/mockery": "^1.6",
-        "pestphp/pest": "^2.0.0",
+        "mozex/anthropic-php": "^1.1.0",
+        "pestphp/pest": "^2.36",
+        "pestphp/pest-plugin-type-coverage": "^2.8",
         "phpstan/phpstan": "^1.8.6",
         "symfony/var-dumper": "^6.2.0"
+    },
+    "suggest": {
+        "mozex/anthropic-php": "Required to use Anthropic's API integration"
     },
     "autoload": {
         "psr-4": {
@@ -56,6 +62,7 @@
         "tests:types": "phpstan analyse -c ./phpstan.neon.dist --ansi",
         "tests:type": "@tests:types",
         "tests:unit": "pest --colors=always",
+        "tests:coverage": "XDEBUG_MODE=coverage pest --coverage",
         "tests": [
             "@tests:lint",
             "@tests:types",

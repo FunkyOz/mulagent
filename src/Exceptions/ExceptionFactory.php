@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MulAgent\Exceptions;
 
+use InvalidArgumentException;
+
 /**
  * @internal
  */
@@ -37,5 +39,10 @@ final class ExceptionFactory
     public static function createToolExecutionException(string $message): ToolExecutionException
     {
         return new ToolExecutionException($message, self::TOOL_EXECUTION_EX_CODE);
+    }
+
+    public static function createAnthropicDisabledException(): InvalidArgumentException
+    {
+        return new InvalidArgumentException('Anthropic support disabled, run composer require mozex/anthropic-php');
     }
 }

@@ -17,7 +17,7 @@ final class ImageContent extends Content
 
     public function getType(): ContentType
     {
-        return ContentType::IMAGE_URL;
+        return ContentType::IMAGE;
     }
 
     public function getValue(): string
