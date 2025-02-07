@@ -15,6 +15,7 @@ final class ExceptionFactory
     private const INVALID_RESPONSE_EX_CODE = 2;
     private const TOOL_FORMAT_EX_CODE = 3;
     private const TOOL_EXECUTION_EX_CODE = 4;
+    private const INVALID_IMAGE_EX_CODE = 4;
 
     /**
      * @param  string  $message
@@ -44,5 +45,10 @@ final class ExceptionFactory
     public static function createAnthropicDisabledException(): InvalidArgumentException
     {
         return new InvalidArgumentException('Anthropic support disabled, run composer require mozex/anthropic-php');
+    }
+
+    public static function createInvalidImageException(string $message): InvalidImageException
+    {
+        return new InvalidImageException($message, self::INVALID_IMAGE_EX_CODE);
     }
 }
