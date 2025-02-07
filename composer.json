@@ -1,6 +1,6 @@
 {
     "name": "funkyoz/mulagent",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "LLM multi agent library",
     "keywords": [
         "php",
@@ -8,7 +8,8 @@
         "ai",
         "agent",
         "multi agent",
-        "openai"
+        "openai",
+        "anthropic"
     ],
     "license": "MIT",
     "authors": [
