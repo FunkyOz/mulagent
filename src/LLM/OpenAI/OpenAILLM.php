@@ -9,6 +9,7 @@ use MulAgent\Exceptions\ExceptionFactory;
 use MulAgent\LLM\LLM;
 use MulAgent\LLM\LLMResult;
 use MulAgent\Message\Content;
+use MulAgent\Message\ContentType;
 use MulAgent\Message\Message;
 use MulAgent\Tool\ToolCall;
 use MulAgent\Tool\ToolFormatter;
@@ -34,10 +35,8 @@ final class OpenAILLM implements LLM
                 ->withBaseUri($config?->baseUrl ?? '')
                 ->withOrganization($config?->organization);
             $headers = $config?->headers ?? [];
-            if (count($headers) > 0) {
-                foreach ($headers as $name => $value) {
-                    $factory = $factory->withHttpHeader($name, $value);
-                }
+            foreach ($headers as $name => $value) {
+                $factory = $factory->withHttpHeader($name, $value);
             }
             $this->client = $factory->make();
         }
@@ -64,7 +63,10 @@ final class OpenAILLM implements LLM
         }
         if (count($tools) > 0) {
             $parameters['tools'] = array_map(
-                fn ($tool) => ToolFormatter::formatToolAsJsonSchema($tool),
+                fn ($tool) => [
+                    'type' => 'function',
+                    'function' => ToolFormatter::formatToolAsJsonSchema($tool),
+                ],
                 $tools
             );
         }
@@ -104,15 +106,15 @@ final class OpenAILLM implements LLM
         return array_map(function (Message $message): array {
             $openAIMessage = [
                 'role' => $message->role->value,
-                'content' => array_map(fn (Content $content) => [
-                    'type' => $content->getType()->value,
-                    $content->getType()->value => $content->getValue()
-                ], $message->content),
+                'content' => array_map(function (Content $content) {
+                    $type = match ($content->getType()) {
+                        ContentType::TEXT => 'text',
+                        ContentType::IMAGE => 'image_url',
+                    };
+                    return ['type' => $type, $type => $content->getValue()];
+                }, $message->content),
             ];
-            if (count($message->additionalArgs) > 0) {
-                $openAIMessage = array_merge($openAIMessage, $message->additionalArgs);
-            }
-            return $openAIMessage;
+            return array_merge($openAIMessage, $message->additionalArgs);
         }, $messages);
     }
 }

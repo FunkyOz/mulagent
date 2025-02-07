@@ -18,7 +18,7 @@ final class AgentTool
         ?string $description = null
     ) {
         $name ??= $this->agent->name;
-        $this->name = 'transfer_to_'.ToolFormatter::formatJsonSchemaName($name).'_agent';
+        $this->name = 'transfer_to_'.ToolFormatter::formatName($name).'_agent';
         $this->description = $description ?? 'Transfer the conversation to agent '.$name;
     }
 

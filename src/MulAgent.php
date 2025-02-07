@@ -104,7 +104,7 @@ final class MulAgent
     {
         $toolMap = [];
         foreach ($tools as $tool) {
-            $toolMap[ToolFormatter::getName($tool)] = $tool;
+            $toolMap[ToolFormatter::getToolName($tool)] = $tool;
         }
         return $toolMap;
     }

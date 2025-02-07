@@ -1,65 +1,62 @@
 {
-    "type": "function",
-    "function": {
-        "name": "test",
-        "description": "Tool description",
-        "strict": true,
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "test": {
-                    "type": "object",
-                    "description": "The test description",
-                    "properties": {
-                        "name": {
-                            "type": "string"
-                        },
-                        "integer": {
-                            "type": "integer"
-                        },
-                        "boolean": {
-                            "type": "boolean"
-                        },
-                        "float": {
-                            "type": "number"
-                        },
-                        "stringEnum": {
-                            "type": "string",
-                            "enum": [
-                                "test"
-                            ]
-                        }
+    "name": "test",
+    "description": "Tool description",
+    "strict": true,
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "test": {
+                "type": "object",
+                "description": "The test description",
+                "properties": {
+                    "name": {
+                        "type": "string"
                     },
-                    "required": [
-                        "name",
-                        "integer",
-                        "boolean",
-                        "float"
-                    ]
+                    "integer": {
+                        "type": "integer"
+                    },
+                    "boolean": {
+                        "type": "boolean"
+                    },
+                    "float": {
+                        "type": "number"
+                    },
+                    "stringEnum": {
+                        "type": "string",
+                        "enum": [
+                            "test"
+                        ]
+                    }
                 },
-                "myString": {
-                    "type": "string",
-                    "description": "The myString work as a valid string type with description"
-                },
-                "myEnum": {
-                    "type": "string",
-                    "enum": [
-                        "TEST"
-                    ]
-                },
-                "myIntEnum": {
-                    "type": "integer",
-                    "enum": [
-                        0
-                    ]
-                }
+                "required": [
+                    "name",
+                    "integer",
+                    "boolean",
+                    "float"
+                ]
             },
-            "required": [
-                "test",
-                "myString",
-                "myEnum"
-            ],
-            "additionalProperties": false
-        }
+            "myString": {
+                "type": "string",
+                "description": "The myString work as a valid string type with description"
+            },
+            "myEnum": {
+                "type": "string",
+                "enum": [
+                    "TEST"
+                ]
+            },
+            "myIntEnum": {
+                "type": "integer",
+                "enum": [
+                    0
+                ]
+            }
+        },
+        "required": [
+            "test",
+            "myString",
+            "myEnum"
+        ],
+        "additionalProperties": false
     }
 }

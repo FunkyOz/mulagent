@@ -28,7 +28,7 @@ final class ToolFormatter
         $invokeMethod = self::ensureFunctor($reflectionClass);
         $schema = [
             'strict' => true,
-            'name' => self::getName($tool),
+            'name' => self::getToolName($tool),
         ];
         if (property_exists($tool, 'description')) {
             $schema['description'] = $tool->description;
@@ -49,10 +49,7 @@ final class ToolFormatter
             'required' => $required,
             'additionalProperties' => false,
         ];
-        return [
-            'type' => 'function',
-            'function' => $schema,
-        ];
+        return $schema;
     }
 
     /**
@@ -71,7 +68,7 @@ final class ToolFormatter
      * @param  callable&object  $tool
      * @return non-empty-string
      */
-    public static function getName($tool): string
+    public static function getToolName($tool): string
     {
         $reflectionClass = new ReflectionClass($tool);
 
@@ -82,14 +79,14 @@ final class ToolFormatter
         } elseif ($reflectionClass->isAnonymous()) {
             throw ExceptionFactory::createToolFormatException('Cannot use anonymous classes as tool without the $name property');
         }
-        $name = self::formatJsonSchemaName($name);
+        $name = self::formatName($name);
         if (empty($name)) {
             throw ExceptionFactory::createToolFormatException('Tool name cannot be empty');
         }
         return $name;
     }
 
-    public static function formatJsonSchemaName(string $name): string
+    public static function formatName(string $name): string
     {
         $separator = '_';
         if (!ctype_lower($name)) {
