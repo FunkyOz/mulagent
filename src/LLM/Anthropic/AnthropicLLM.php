@@ -176,8 +176,7 @@ final class AnthropicLLM implements LLM
         $data = file_get_contents($content->getValue());
         $mimeType = mime_content_type($content->getValue());
         if (false === $data || false === $mimeType) {
-            // TODO
-            throw new \RuntimeException('Unable to read image content');
+            throw ExceptionFactory::createInvalidImageException('Unable to convert image to base64');
         }
         return [base64_encode($data), $mimeType];
     }
